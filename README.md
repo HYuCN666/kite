@@ -85,6 +85,8 @@ systemctl enable --now kite
 
 4. 浏览器访问 `http://服务器IP:8080`，默认账号 `admin` / `admin`（首次登录后请修改密码）。
 
+> **安全提示**：JWT 密钥会自动生成并持久化到 `--data` 目录下的 `.secret` 文件（无需手动配置）；也可通过 `KITE_SECRET` 环境变量指定。面板 HTTPS 通过 `--tls-cert` / `--tls-key` 启用，建议经 Nginx/Caddy 反代添加 TLS，而非直接暴露公网。
+
 ### 方式二：Docker
 
 ```bash

@@ -69,6 +69,9 @@ func (s *Server) Run() error {
 	go s.maintenance(context.Background())
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Bind, s.cfg.Port)
+	if s.cfg.TLSCert != "" && s.cfg.TLSKey != "" {
+		return r.RunTLS(addr, s.cfg.TLSCert, s.cfg.TLSKey)
+	}
 	return r.Run(addr)
 }
 
@@ -97,7 +100,7 @@ func (s *Server) routes(r *gin.Engine) {
 	r.GET("/ws", s.wsHandler)
 
 	v1g := r.Group("/api/v1")
-	v1g.POST("/auth/login", s.handler.Login)
+	v1g.POST("/auth/login", middleware.NewRateLimiter(5, time.Minute).Middleware(), s.handler.Login)
 
 	authed := v1g.Group("")
 	authed.Use(middleware.Auth(s.auth))
