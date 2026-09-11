@@ -1,0 +1,10 @@
+services:
+  kite:
+    build: .
+    container_name: kite
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - KITE_SECRET=change-me
+    volumes:
+      - ./data:/app/data
