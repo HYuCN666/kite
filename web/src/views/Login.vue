@@ -47,7 +47,7 @@ async function handleSubmit() {
   loading.value = true
   try {
     const res = await http.post<{ data: { token: string } }>('/auth/login', form)
-    auth.setToken(res.data.data.token)
+    auth.setToken(res.data.token)
     auth.setUsername(form.username)
     Message.success('登录成功')
     router.push('/dashboard')

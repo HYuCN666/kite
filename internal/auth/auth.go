@@ -20,13 +20,13 @@ func NewManager(secret string, ttl time.Duration) *Manager {
 }
 
 // HashPassword 生成 bcrypt 哈希。
-func HashPassword(password string) (string, error) {
+func (m *Manager) HashPassword(password string) (string, error) {
 	b, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(b), err
 }
 
 // CheckPassword 校验明文密码与哈希。
-func CheckPassword(hash, password string) bool {
+func (m *Manager) CheckPassword(hash, password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 

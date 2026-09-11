@@ -51,7 +51,7 @@ func (m *Manager) Running() bool {
 	return m.proc.IsRunning()
 }
 
-// WriteConfig 将配置写入文件并触发热重载。
+// WriteConfig 将配置写入文件，并在内核已安装时触发热重载。
 func (m *Manager) WriteConfig(cfg *config.Config) error {
 	if err := os.MkdirAll(filepath.Dir(m.configPath), 0o700); err != nil {
 		return err
@@ -62,6 +62,9 @@ func (m *Manager) WriteConfig(cfg *config.Config) error {
 	}
 	if err := os.WriteFile(m.configPath, data, 0o600); err != nil {
 		return err
+	}
+	if !m.Installed() {
+		return nil
 	}
 	return m.Restart()
 }

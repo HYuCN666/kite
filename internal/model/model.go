@@ -24,20 +24,20 @@ type Inbound struct {
 
 // User 对应一个订阅用户。
 type User struct {
-	ID                int64      `json:"id"`
-	InboundID         int64      `json:"inbound_id"`
-	Email             string     `json:"email"`
-	UUID              string     `json:"uuid"`
-	Remark            string     `json:"remark"`
-	QuotaBytes        int64      `json:"quota_bytes"`
-	UsedUplink        int64      `json:"used_uplink"`
-	UsedDownlink      int64      `json:"used_downlink"`
+	ID                 int64      `json:"id"`
+	InboundID          int64      `json:"inbound_id"`
+	Email              string     `json:"email"`
+	UUID               string     `json:"uuid"`
+	Remark             string     `json:"remark"`
+	QuotaBytes         int64      `json:"quota_bytes"`
+	UsedUplink         int64      `json:"used_uplink"`
+	UsedDownlink       int64      `json:"used_downlink"`
 	SpeedLimitUplink   int64      `json:"speed_limit_uplink"`
 	SpeedLimitDownlink int64      `json:"speed_limit_downlink"`
-	ExpireAt          *time.Time `json:"expire_at"`
-	Enabled           bool       `json:"enabled"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
+	ExpireAt           *time.Time `json:"expire_at"`
+	Enabled            bool       `json:"enabled"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
 }
 
 // Admin 对应面板管理员。

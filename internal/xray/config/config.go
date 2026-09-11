@@ -4,13 +4,13 @@ import "encoding/json"
 
 // Config 为 Xray 运行时配置的顶层结构。
 type Config struct {
-	Log       *LogConfig       `json:"log,omitempty"`
-	Inbounds  []Inbound        `json:"inbounds,omitempty"`
-	Outbounds []Outbound       `json:"outbounds,omitempty"`
-	Stats     *StatsConfig     `json:"stats,omitempty"`
-	Policy    *PolicyConfig    `json:"policy,omitempty"`
-	API       *APIConfig       `json:"api,omitempty"`
-	Routing   *RoutingConfig   `json:"routing,omitempty"`
+	Log       *LogConfig     `json:"log,omitempty"`
+	Inbounds  []Inbound      `json:"inbounds,omitempty"`
+	Outbounds []Outbound     `json:"outbounds,omitempty"`
+	Stats     *StatsConfig   `json:"stats,omitempty"`
+	Policy    *PolicyConfig  `json:"policy,omitempty"`
+	API       *APIConfig     `json:"api,omitempty"`
+	Routing   *RoutingConfig `json:"routing,omitempty"`
 }
 
 // LogConfig 为日志配置。
@@ -47,17 +47,17 @@ type VLESSInboundSettings struct {
 
 // StreamSettings 为传输层设置。
 type StreamSettings struct {
-	Network  string          `json:"network,omitempty"`
-	Security string          `json:"security,omitempty"`
+	Network     string       `json:"network,omitempty"`
+	Security    string       `json:"security,omitempty"`
 	TLSSettings *TLSSettings `json:"tlsSettings,omitempty"`
 	WSSettings  *WSSettings  `json:"wsSettings,omitempty"`
 }
 
 // TLSSettings 为 TLS 设置。
 type TLSSettings struct {
-	ServerName    string        `json:"serverName,omitempty"`
-	Certificates  []Certificate `json:"certificates,omitempty"`
-	ALPN          []string      `json:"alpn,omitempty"`
+	ServerName   string        `json:"serverName,omitempty"`
+	Certificates []Certificate `json:"certificates,omitempty"`
+	ALPN         []string      `json:"alpn,omitempty"`
 }
 
 // Certificate 为 TLS 证书。
@@ -105,8 +105,10 @@ type PolicyLevel struct {
 
 // PolicySystem 为系统级策略。
 type PolicySystem struct {
-	StatsInboundUplink   bool `json:"statsInboundUplink,omitempty"`
-	StatsInboundDownlink bool `json:"statsInboundDownlink,omitempty"`
+	StatsInboundUplink    bool `json:"statsInboundUplink,omitempty"`
+	StatsInboundDownlink  bool `json:"statsInboundDownlink,omitempty"`
+	StatsOutboundUplink   bool `json:"statsOutboundUplink,omitempty"`
+	StatsOutboundDownlink bool `json:"statsOutboundDownlink,omitempty"`
 }
 
 // APIConfig 为 Xray API 配置。
