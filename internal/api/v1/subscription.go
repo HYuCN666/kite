@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/HYuCN666/kite/internal/model"
-	"github.com/HYuCN666/kite/internal/subscription"
+	"github.com/HYuCN666/volans/internal/model"
+	"github.com/HYuCN666/volans/internal/subscription"
 )
 
 // Sub 处理公开的订阅下载（/sub/:token）。

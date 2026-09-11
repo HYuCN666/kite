@@ -1,4 +1,4 @@
-module github.com/HYuCN666/kite
+module github.com/HYuCN666/volans
 
 go 1.26.0
 

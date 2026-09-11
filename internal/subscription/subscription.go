@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 // Node 表示一个可订阅的代理节点。

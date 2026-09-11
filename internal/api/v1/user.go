@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 type userRequest struct {

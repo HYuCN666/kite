@@ -12,14 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
-	"github.com/HYuCN666/kite/internal/api/middleware"
-	v1 "github.com/HYuCN666/kite/internal/api/v1"
-	"github.com/HYuCN666/kite/internal/auth"
-	"github.com/HYuCN666/kite/internal/config"
-	"github.com/HYuCN666/kite/internal/stats"
-	"github.com/HYuCN666/kite/internal/store"
-	"github.com/HYuCN666/kite/internal/ws"
-	"github.com/HYuCN666/kite/internal/xray"
+	"github.com/HYuCN666/volans/internal/api/middleware"
+	v1 "github.com/HYuCN666/volans/internal/api/v1"
+	"github.com/HYuCN666/volans/internal/auth"
+	"github.com/HYuCN666/volans/internal/config"
+	"github.com/HYuCN666/volans/internal/stats"
+	"github.com/HYuCN666/volans/internal/store"
+	"github.com/HYuCN666/volans/internal/ws"
+	"github.com/HYuCN666/volans/internal/xray"
 )
 
 const statsAPIAddr = "127.0.0.1:10085"

@@ -1,18 +1,18 @@
-﻿:root {
-  --kite-bg: #f5f6f8;
-  --kite-surface: #ffffff;
-  --kite-border: #e5e6eb;
-  --kite-text: #1d2129;
-  --kite-text-secondary: #86909c;
-  --kite-primary: #165dff;
+:root {
+  --volans-bg: #f5f6f8;
+  --volans-surface: #ffffff;
+  --volans-border: #e5e6eb;
+  --volans-text: #1d2129;
+  --volans-text-secondary: #86909c;
+  --volans-primary: #165dff;
 }
 
 html[arco-theme='dark'] {
-  --kite-bg: #17171a;
-  --kite-surface: #232324;
-  --kite-border: #2e2e30;
-  --kite-text: #e5e6eb;
-  --kite-text-secondary: #86909c;
+  --volans-bg: #17171a;
+  --volans-surface: #232324;
+  --volans-border: #2e2e30;
+  --volans-text: #e5e6eb;
+  --volans-text-secondary: #86909c;
 }
 
 * {
@@ -30,8 +30,8 @@ body,
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
     'Microsoft YaHei', sans-serif;
-  background: var(--kite-bg);
-  color: var(--kite-text);
+  background: var(--volans-bg);
+  color: var(--volans-text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -46,13 +46,13 @@ body {
 .page-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--kite-text);
+  color: var(--volans-text);
 }
 
 .page-desc {
   margin-top: 4px;
   font-size: 13px;
-  color: var(--kite-text-secondary);
+  color: var(--volans-text-secondary);
 }
 
 .card-grid {

@@ -4,7 +4,7 @@ WORKDIR /src
 COPY go.mod go.sum* ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /kite ./cmd/kite
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /volans ./cmd/volans
 
 # ---- 构建前端 ----
 FROM node:20-alpine AS frontend
@@ -18,7 +18,7 @@ RUN npm run build
 FROM alpine:3.20
 RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
-COPY --from=backend /kite ./kite
+COPY --from=backend /volans ./volans
 COPY --from=frontend /web/dist ./web/dist
 EXPOSE 8080
-ENTRYPOINT ["./kite"]
+ENTRYPOINT ["./volans"]

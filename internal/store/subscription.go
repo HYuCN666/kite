@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 // CreateSubscription 创建订阅令牌。

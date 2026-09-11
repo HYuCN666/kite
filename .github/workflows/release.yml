@@ -42,13 +42,13 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          BIN=kite
-          if [ "$GOOS" = "windows" ]; then BIN=kite.exe; fi
-          mkdir -p pkg/kite/web
-          CGO_ENABLED=0 go build -ldflags="-s -w" -o "pkg/kite/$BIN" ./cmd/kite
-          cp -r web/dist pkg/kite/web/
-          tar -C pkg -czf "kite-$GOOS-$GOARCH.tar.gz" kite
+          BIN=volans
+          if [ "$GOOS" = "windows" ]; then BIN=volans.exe; fi
+          mkdir -p pkg/volans/web
+          CGO_ENABLED=0 go build -ldflags="-s -w" -o "pkg/volans/$BIN" ./cmd/volans
+          cp -r web/dist pkg/volans/web/
+          tar -C pkg -czf "volans-$GOOS-$GOARCH.tar.gz" volans
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: kite-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          files: volans-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz

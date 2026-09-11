@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 const userColumns = `id, inbound_id, email, uuid, remark, quota_bytes, used_uplink, used_downlink,

@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <a-layout class="layout">
     <a-layout-sider :width="220" class="sider">
-      <div class="logo">Kite</div>
+      <div class="logo">Volans</div>
       <a-menu :selected-keys="selectedKeys" @menu-item-click="onMenuClick">
         <a-menu-item key="/dashboard">
           <template #icon><icon-dashboard /></template>仪表盘
@@ -57,11 +57,11 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const selectedKeys = computed(() => [route.path])
-const theme = ref(localStorage.getItem('kite_theme') || 'dark')
+const theme = ref(localStorage.getItem('volans_theme') || 'dark')
 
 function applyTheme() {
   document.documentElement.setAttribute('arco-theme', theme.value)
-  localStorage.setItem('kite_theme', theme.value)
+  localStorage.setItem('volans_theme', theme.value)
 }
 
 function toggleTheme() {
@@ -87,8 +87,8 @@ applyTheme()
 }
 
 .sider {
-  background: var(--kite-surface);
-  border-right: 1px solid var(--kite-border);
+  background: var(--volans-surface);
+  border-right: 1px solid var(--volans-border);
 }
 
 .logo {
@@ -98,7 +98,7 @@ applyTheme()
   padding: 0 20px;
   font-size: 18px;
   font-weight: 700;
-  color: var(--kite-primary);
+  color: var(--volans-primary);
 }
 
 .header {
@@ -107,8 +107,8 @@ applyTheme()
   align-items: center;
   justify-content: flex-end;
   padding: 0 20px;
-  background: var(--kite-surface);
-  border-bottom: 1px solid var(--kite-border);
+  background: var(--volans-surface);
+  border-bottom: 1px solid var(--volans-border);
 }
 
 .header-right {
@@ -119,11 +119,11 @@ applyTheme()
 
 .username {
   cursor: pointer;
-  color: var(--kite-text);
+  color: var(--volans-text);
 }
 
 .content {
   overflow: auto;
-  background: var(--kite-bg);
+  background: var(--volans-bg);
 }
 </style>

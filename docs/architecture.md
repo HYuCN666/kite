@@ -1,4 +1,4 @@
-# Kite 架构设计文档
+# Volans 架构设计文档
 
 > 版本：v0.1 · 状态：草稿
 
@@ -37,16 +37,16 @@
                 │                        │
         ┌───────▼───────┐        ┌───────▼────────┐
         │   SQLite 文件  │        │  Xray-core 进程 │
-        │  (kite.db)  │        │ (systemd 托管)  │
+        │  (volans.db)  │        │ (systemd 托管)  │
         └───────────────┘        └────────────────┘
 ```
 
 ## 3. 目录结构
 
 ```
-kite/
+volans/
 ├── cmd/
-│   └── kite/             # 入口 main.go（flag 解析、装配）
+│   └── volans/             # 入口 main.go（flag 解析、装配）
 ├── internal/
 │   ├── server/            # HTTP 服务、路由注册、WS 升级
 │   ├── api/               # REST handlers、请求/响应 DTO
@@ -159,7 +159,7 @@ stats 包启动定时任务（默认 10s）
 
 ## 8. 部署方式
 
-1. **单二进制**：`go install` / 下载 release，`kite` 直接运行。
+1. **单二进制**：`go install` / 下载 release，`volans` 直接运行。
 2. **Docker**：镜像内置面板 + 共享 Xray 进程卷。
 3. **一键脚本**：`scripts/install.sh`（Ubuntu/Debian）自动下载、建 systemd 服务、开机自启。
 

@@ -1,10 +1,10 @@
 services:
-  kite:
+  volans:
     build: .
-    container_name: kite
+    container_name: volans
     restart: unless-stopped
     network_mode: host
     environment:
-      - KITE_SECRET=change-me
+      - VOLANS_SECRET=change-me
     volumes:
       - ./data:/app/data

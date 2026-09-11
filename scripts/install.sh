@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Kite 一键安装脚本（Ubuntu / Debian）
+# Volans 一键安装脚本（Ubuntu / Debian）
 # 用法：bash install.sh
 
 ARCH="$(uname -m)"
@@ -16,8 +16,8 @@ if [[ "$(id -u)" -ne 0 ]]; then
   exit 1
 fi
 
-INSTALL_DIR="/opt/kite"
-DATA_DIR="/etc/kite"
+INSTALL_DIR="/opt/volans"
+DATA_DIR="/etc/volans"
 
 echo "==> 创建目录"
 mkdir -p "$INSTALL_DIR" "$DATA_DIR"
@@ -28,20 +28,20 @@ curl -L -o /tmp/xray.zip "$XRAY_URL"
 unzip -o /tmp/xray.zip -d /tmp/xray
 install -m 755 /tmp/xray/xray /usr/local/bin/xray
 
-echo "==> 安装 Kite"
+echo "==> 安装 Volans"
 # 此处替换为实际的 release 下载地址
-# curl -L -o "$INSTALL_DIR/kite" "https://github.com/HYuCN666/kite/releases/latest/download/kite-linux-${ARCH}"
-# install -m 755 "$INSTALL_DIR/kite" /usr/local/bin/kite
+# curl -L -o "$INSTALL_DIR/volans" "https://github.com/HYuCN666/volans/releases/latest/download/volans-linux-${ARCH}"
+# install -m 755 "$INSTALL_DIR/volans" /usr/local/bin/volans
 
 echo "==> 创建 systemd 服务"
-cat > /etc/systemd/system/kite.service <<EOF
+cat > /etc/systemd/system/volans.service <<EOF
 [Unit]
-Description=Kite
+Description=Volans
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/kite --data "$DATA_DIR"
+ExecStart=/usr/local/bin/volans --data "$DATA_DIR"
 Restart=on-failure
 RestartSec=5
 
@@ -50,7 +50,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable kite
-systemctl start kite
+systemctl enable volans
+systemctl start volans
 
 echo "==> 安装完成，面板地址: http://127.0.0.1:8080"

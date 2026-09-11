@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/HYuCN666/kite/internal/config"
-	"github.com/HYuCN666/kite/internal/server"
-	"github.com/HYuCN666/kite/internal/store"
+	"github.com/HYuCN666/volans/internal/config"
+	"github.com/HYuCN666/volans/internal/server"
+	"github.com/HYuCN666/volans/internal/store"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 // CreateAdmin 创建管理员，返回新 ID。

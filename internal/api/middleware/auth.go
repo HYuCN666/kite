@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/HYuCN666/kite/internal/auth"
+	"github.com/HYuCN666/volans/internal/auth"
 )
 
 // Auth 返回校验 Bearer token 的中间件。

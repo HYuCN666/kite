@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/HYuCN666/kite/internal/xray/config"
-	"github.com/HYuCN666/kite/internal/xray/proc"
+	"github.com/HYuCN666/volans/internal/xray/config"
+	"github.com/HYuCN666/volans/internal/xray/proc"
 )
 
 // Manager 负责 Xray 内核的安装、进程控制与配置生成。

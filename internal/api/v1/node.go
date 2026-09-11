@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/HYuCN666/kite/internal/system"
+	"github.com/HYuCN666/volans/internal/system"
 )
 
 // Status 返回内核状态。

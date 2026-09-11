@@ -36,9 +36,9 @@ func Load() (*Config, error) {
 	flag.StringVar(&dataDir, "data", defaultDataDir(), "data directory")
 	flag.StringVar(&xrayPath, "xray", "/usr/local/bin/xray", "xray binary path")
 	flag.StringVar(&webDir, "web", "web/dist", "web dist directory")
-	flag.StringVar(&secret, "secret", os.Getenv("KITE_SECRET"), "jwt signing secret")
-	flag.StringVar(&tlsCert, "tls-cert", os.Getenv("KITE_TLS_CERT"), "panel tls certificate path")
-	flag.StringVar(&tlsKey, "tls-key", os.Getenv("KITE_TLS_KEY"), "panel tls key path")
+	flag.StringVar(&secret, "secret", os.Getenv("VOLANS_SECRET"), "jwt signing secret")
+	flag.StringVar(&tlsCert, "tls-cert", os.Getenv("VOLANS_TLS_CERT"), "panel tls certificate path")
+	flag.StringVar(&tlsKey, "tls-key", os.Getenv("VOLANS_TLS_KEY"), "panel tls key path")
 	flag.Parse()
 
 	if secret == "" {
@@ -85,7 +85,7 @@ func loadOrCreateSecret(dataDir string) (string, error) {
 }
 
 func defaultDataDir() string {
-	if d := os.Getenv("KITE_DATA"); d != "" {
+	if d := os.Getenv("VOLANS_DATA"); d != "" {
 		return d
 	}
 	return filepath.Join(".", "data")

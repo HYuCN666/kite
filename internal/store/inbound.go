@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/HYuCN666/kite/internal/model"
+	"github.com/HYuCN666/volans/internal/model"
 )
 
 const inboundColumns = `id, tag, remark, protocol, port, listen, transport, stream_settings,

@@ -3,8 +3,8 @@
 *.exe
 *.test
 *.out
-/kite
-kite.db
+/volans
+volans.db
 
 # Node
 node_modules/

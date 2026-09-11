@@ -1,4 +1,4 @@
-# Kite
+# Volans
 
 > 风筝，要飞得高，得先放开手里的线。
 
@@ -6,13 +6,13 @@
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go)](https://go.dev)
 [![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vue.js)](https://vuejs.org)
 
-**Kite** 是一个自托管的可视化代理部署管理面板。它把「装内核、配节点、开用户、发订阅」这串繁琐的运维动作，压缩成浏览器里点几下鼠标。
+**Volans** 是一个自托管的可视化代理部署管理面板。它把「装内核、配节点、开用户、发订阅」这串繁琐的运维动作，压缩成浏览器里点几下鼠标。
 
 几分钟内，一台光秃秃的服务器就能变成一台可运营的代理节点。
 
 ## 名字
 
-「Kite」是风筝。风筝和代理都做同一件事——**让流量轻盈地飞出去**。我们希望你用 Kite 管理代理，就像放风筝一样轻松：看清风向，握住主线，剩下的交给它飞。
+「Volans」是风筝。风筝和代理都做同一件事——**让流量轻盈地飞出去**。我们希望你用 Volans 管理代理，就像放风筝一样轻松：看清风向，握住主线，剩下的交给它飞。
 
 ## 特性
 
@@ -24,9 +24,9 @@
 - **安全默认**：自动生成持久化密钥、登录失败锁定、登录限流、面板 HTTPS
 - **现代 UI**：Arco Design 极简商务风，暗/亮双主题
 
-## 为什么是 Kite
+## 为什么是 Volans
 
-| | Kite | 同类面板 |
+| | Volans | 同类面板 |
 |---|---|---|
 | 界面 | 现代极简，暗色优先 | 多为传统后台风格 |
 | 架构 | 清晰分层，Go 单二进制 | 部分耦合较重 |
@@ -37,7 +37,7 @@
 
 ```bash
 # 后端
-cd cmd/kite
+cd cmd/volans
 go run .
 
 # 前端（另开终端）
@@ -50,27 +50,27 @@ npm run dev
 
 ## 部署
 
-详见 [Release](https://github.com/HYuCN666/kite/releases) 的二进制包，或：
+详见 [Release](https://github.com/HYuCN666/volans/releases) 的二进制包，或：
 
 ```bash
 # 下载对应平台包（以 linux-amd64 为例）
-tar -xzf kite-linux-amd64.tar.gz -C /opt
-ln -s /opt/kite/kite /usr/local/bin/kite
+tar -xzf volans-linux-amd64.tar.gz -C /opt
+ln -s /opt/volans/volans /usr/local/bin/volans
 
 # systemd 服务
-cat > /etc/systemd/system/kite.service <<'EOF'
+cat > /etc/systemd/system/volans.service <<'EOF'
 [Unit]
-Description=Kite
+Description=Volans
 After=network.target
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/kite --bind 0.0.0.0 --port 8080 --data /etc/kite --web /opt/kite/web/dist
+ExecStart=/usr/local/bin/volans --bind 0.0.0.0 --port 8080 --data /etc/volans --web /opt/volans/web/dist
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
 
-systemctl daemon-reload && systemctl enable --now kite
+systemctl daemon-reload && systemctl enable --now volans
 ```
 
 > 安全提示：JWT 密钥自动生成并持久化到 `--data/.secret`；面板 HTTPS 用 `--tls-cert` / `--tls-key` 启用，建议经 Nginx/Caddy 反代，而非裸奔公网。

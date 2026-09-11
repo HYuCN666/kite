@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/HYuCN666/kite/internal/model"
-	"github.com/HYuCN666/kite/internal/xray/config"
+	"github.com/HYuCN666/volans/internal/model"
+	"github.com/HYuCN666/volans/internal/xray/config"
 )
 
 // BuildOptions 控制配置生成的路径与 API 端口。

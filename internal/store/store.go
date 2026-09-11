@@ -19,7 +19,7 @@ func Open(dataDir string) (*Store, error) {
 		return nil, err
 	}
 
-	db, err := sql.Open("sqlite", filepath.Join(dataDir, "kite.db"))
+	db, err := sql.Open("sqlite", filepath.Join(dataDir, "volans.db"))
 	if err != nil {
 		return nil, err
 	}

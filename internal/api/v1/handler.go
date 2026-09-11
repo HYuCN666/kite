@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/HYuCN666/kite/internal/auth"
-	"github.com/HYuCN666/kite/internal/stats"
-	"github.com/HYuCN666/kite/internal/store"
-	"github.com/HYuCN666/kite/internal/xray"
+	"github.com/HYuCN666/volans/internal/auth"
+	"github.com/HYuCN666/volans/internal/stats"
+	"github.com/HYuCN666/volans/internal/store"
+	"github.com/HYuCN666/volans/internal/xray"
 )
 
 // Handler 聚合所有 API handler 依赖。

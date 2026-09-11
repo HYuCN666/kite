@@ -208,6 +208,6 @@ onMounted(load)
 
 .usage-text {
   font-size: 12px;
-  color: var(--kite-text-secondary);
+  color: var(--volans-text-secondary);
 }
 </style>
