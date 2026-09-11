@@ -1,6 +1,6 @@
 # Volans
 
-> 风筝，要飞得高，得先放开手里的线。
+> 飞鱼跃出海面，不是为了逃离海洋，而是为了自由地前行。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go)](https://go.dev)
@@ -12,7 +12,7 @@
 
 ## 名字
 
-「Volans」是风筝。风筝和代理都做同一件事——**让流量轻盈地飞出去**。我们希望你用 Volans 管理代理，就像放风筝一样轻松：看清风向，握住主线，剩下的交给它飞。
+「Volans」是飞鱼座——南天的一群星，得名于跃出水面的飞鱼。飞鱼挣脱海水的束缚去滑翔，正如代理让流量摆脱地理的桎梏；而作为航海者借以辨向的星座，它也呼应我们「为流量指引方向」的使命。
 
 ## 特性
 
