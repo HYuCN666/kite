@@ -60,7 +60,36 @@ func (m *Manager) Install() error {
 	}
 	tmp.Close()
 
-	return extractBinary(tmp.Name(), m.binPath)
+	if err := extractBinary(tmp.Name(), m.binPath); err != nil {
+		return err
+	}
+
+	if runtime.GOOS == "linux" {
+		return m.writeSystemdUnit()
+	}
+	return nil
+}
+
+func (m *Manager) writeSystemdUnit() error {
+	unit := fmt.Sprintf(`[Unit]
+Description=Xray Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%s run -config %s
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+`, m.binPath, m.configPath)
+
+	if err := os.WriteFile("/etc/systemd/system/xray.service", []byte(unit), 0o644); err != nil {
+		return err
+	}
+	_ = exec.Command("systemctl", "daemon-reload").Run()
+	return exec.Command("systemctl", "enable", "xray").Run()
 }
 
 func extractBinary(zipPath, binPath string) error {

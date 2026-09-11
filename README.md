@@ -47,6 +47,59 @@ npm install
 npm run dev
 ```
 
+## 部署（Ubuntu/Debian）
+
+Kite 通过 systemd 管理 Xray 内核，建议以 root 权限运行。
+
+### 方式一：下载 Release 二进制
+
+1. 在 [Releases](https://github.com/HYuCN666/kite/releases) 下载对应平台的 `kite-linux-*.tar.gz`。
+2. 解压并放置：
+
+```bash
+tar -xzf kite-linux-amd64.tar.gz -C /opt
+ln -s /opt/kite/kite /usr/local/bin/kite
+```
+
+3. 创建 systemd 服务：
+
+```bash
+cat > /etc/systemd/system/kite.service <<'EOF'
+[Unit]
+Description=Kite
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/kite --bind 0.0.0.0 --port 8080 --data /etc/kite --web /opt/kite/web/dist
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now kite
+```
+
+4. 浏览器访问 `http://服务器IP:8080`，默认账号 `admin` / `admin`（首次登录后请修改密码）。
+
+### 方式二：Docker
+
+```bash
+docker compose up -d
+```
+
+> 注意：Docker 容器内无法直接调用宿主机 systemd 管理 Xray 进程。容器方式下请将 Xray 单独部署在宿主机，或改用原生部署。
+
+## 使用流程
+
+1. 登录后在「系统设置」填写公网地址/域名。
+2. 「入站节点」→ 新建节点（VLESS + WS + TLS）。
+3. 「订阅用户」→ 新建用户，设置流量配额。
+4. 点击「复制订阅」发给用户，或直接访问订阅链接。
+
 ## 许可证
 
 [AGPL-3.0](LICENSE)
