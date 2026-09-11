@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volans - 开源自托管 Xray 正向代理部署管理面板</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 背景粒子与光晕画布 -->
+  <canvas id="canvas-starfield"></canvas>
+  <div class="ambient-glow-top"></div>
+
+  <!-- 1. 顶部导航 -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="nav-logo-text">Volans</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features" class="nav-item" data-i18n="navFeatures">核心特性</a>
+        <a href="#quickstart" class="nav-item" data-i18n="navQuickStart">快速开始</a>
+        <a href="https://github.com/HYuCN666/volans" target="_blank" rel="noopener noreferrer" class="nav-item" data-i18n="navGithub">GitHub 源码</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="lang-btn" onclick="toggleLanguage()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span data-i18n="langToggle">English</span>
+        </button>
+        <a href="https://github.com/HYuCN666/volans" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Hero 区域 -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-pill">
+        <span class="hero-pill-dot"></span>
+        <span data-i18n="badgeText">v1.0.0 稳定版正式发布 &bull; 开源自托管</span>
+      </div>
+
+      <h1 class="hero-title" data-i18n="heroTitle">
+        轻松部署与运营你的 <span class="text-gradient">Xray 正向代理</span> 服务
+      </h1>
+
+      <p class="hero-subtitle" data-i18n="heroSubtitle">
+        Volans 是专为极简运维打造的开源可视化代理控制台。只需点几下鼠标，即可把一台普通服务器变成安全、稳定、可随时分发订阅的节点集群。
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#quickstart" class="btn btn-primary" data-i18n="btnQuickStart">
+          快速开始
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="https://github.com/HYuCN666/volans" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" data-i18n="btnGithub">
+          查看 GitHub
+        </a>
+      </div>
+
+      <!-- 终端风格的一键部署命令块 -->
+      <div class="terminal-wrapper">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="t-dot t-red"></span>
+            <span class="t-dot t-yellow"></span>
+            <span class="t-dot t-green"></span>
+          </div>
+          <span class="terminal-title" data-i18n="cmdLabel">一键快速安装命令</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-command">
+            <span class="command-prompt">$</span>
+            <span id="install-cmd" class="command-code">curl -fsSL https://raw.githubusercontent.com/HYuCN666/volans/main/install.sh | bash</span>
+          </div>
+          <button id="copy-cmd-btn" class="copy-btn" onclick="copyCommand(document.getElementById('install-cmd').innerText)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            复制
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 特性区 -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag" data-i18n="featuresTag">CAPABILITIES</div>
+        <h2 class="section-title" data-i18n="featuresTitle">为现代代理运维而生的全部特性</h2>
+        <p class="section-desc" data-i18n="featuresDesc">抛弃繁琐难懂的 JSON 配置文件，享受开箱即用、安全透明的全新管理体验。</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- 特性 1: 图形化内核管理 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat1Title">可视化内核管理</h3>
+          <p class="feature-desc" data-i18n="feat1Desc">图形化管理 Xray 核心运行状态，零门槛配置 VLESS 协议、监听端口、TCP 及 WebSocket 传输流。</p>
+        </div>
+
+        <!-- 特性 2: 机场式订阅用户 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat2Title">订阅用户与配额管理</h3>
+          <p class="feature-desc" data-i18n="feat2Desc">支持创建独立订阅客户，精细分配总流量配额、上下行独立限速，以及设置自定义到期时间。</p>
+        </div>
+
+        <!-- 特性 3: 实时流量监控 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat3Title">实时流量监控</h3>
+          <p class="feature-desc" data-i18n="feat3Desc">内置 WebSocket 双向低延迟通信，即时推送每秒上/下行网络吞吐速率及历史流量曲线。</p>
+        </div>
+
+        <!-- 特性 4: 订阅导出 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat4Title">通用订阅一键导出</h3>
+          <p class="feature-desc" data-i18n="feat4Desc">自动生成标准订阅 Token 与客户端连接，一键复制直连，主流客户端无缝即刻接入。</p>
+        </div>
+
+        <!-- 特性 5: 安全默认 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat5Title">安全默认设计</h3>
+          <p class="feature-desc" data-i18n="feat5Desc">内置 TLS 传输加密与域名嗅探 (Sniffing) 防护，严格的 JWT 身份鉴权与密码哈希保护。</p>
+        </div>
+
+        <!-- 特性 6: 现代 UI -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title" data-i18n="feat6Title">现代极简控制台</h3>
+          <p class="feature-desc" data-i18n="feat6Desc">对标 Vercel / Grafana 设计哲学，支持无缝亮暗色切换，低饱和度科技美学，极致专注操作。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 快速开始区 -->
+  <section id="quickstart" class="section" style="background: rgba(10, 15, 29, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag" data-i18n="quickStartTag">GETTING STARTED</div>
+        <h2 class="section-title" data-i18n="quickStartTitle">三步完成部署上线</h2>
+        <p class="section-desc" data-i18n="quickStartDesc">支持主流 Linux 发行版，单二进制独立运行，无需复杂的第三方运行环境。</p>
+      </div>
+
+      <div class="steps-container">
+        <!-- 步骤 1 -->
+        <div class="step-card">
+          <div class="step-badge" data-i18n="step1Num">01. 下载二进制</div>
+          <h3 class="step-title" data-i18n="step1Title">一键下载发行版</h3>
+          <p class="step-desc" data-i18n="step1Desc">从 GitHub Releases 获取对应架构的预编译二进制执行文件并赋予运行权限：</p>
+          <div class="code-snippet">curl -L -o volans.tar.gz https://github.com/HYuCN666/volans/releases/latest/download/volans-linux-amd64.tar.gz
+tar -xzf volans.tar.gz -C /opt
+ln -s /opt/volans/volans /usr/local/bin/volans</div>
+        </div>
+
+        <!-- 步骤 2 -->
+        <div class="step-card">
+          <div class="step-badge" data-i18n="step2Num">02. 配置守护进程</div>
+          <h3 class="step-title" data-i18n="step2Title">Systemd 后台托管</h3>
+          <p class="step-desc" data-i18n="step2Desc">配置为系统级服务，实现开机自启、崩溃自动重启与标准化日志捕获：</p>
+          <div class="code-snippet">curl -fsSL https://raw.githubusercontent.com/HYuCN666/volans/main/install.sh | bash</div>
+        </div>
+
+        <!-- 步骤 3 -->
+        <div class="step-card">
+          <div class="step-badge" data-i18n="step3Num">03. 访问控制台</div>
+          <h3 class="step-title" data-i18n="step3Title">打开浏览器初始化</h3>
+          <p class="step-desc" data-i18n="step3Desc">在浏览器中输入服务器公网 IP，登录默认管理员账号并开启您的第一个节点：</p>
+          <div class="code-snippet">http://&lt;your-server-ip&gt;:8080
+默认账号: admin / admin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 底部 -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">Volans Project</span>
+        <span class="footer-license">
+          开源许可证：<a href="https://github.com/HYuCN666/volans/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="license-link">AGPL-3.0 License</a>
+        </span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/HYuCN666/volans" target="_blank" rel="noopener noreferrer" class="footer-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+          </svg>
+          HYuCN666/volans
+        </a>
+        <span class="footer-license">&copy; 2026 Volans Contributors. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
