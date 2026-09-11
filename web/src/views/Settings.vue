@@ -154,6 +154,34 @@
         </div>
       </a-col>
     </a-row>
+
+    <a-row :gutter="[20, 20]" style="margin-top: 20px">
+      <a-col :span="24">
+        <div class="custom-card setting-card">
+          <div class="card-header">
+            <div class="header-icon"><icon-notification /></div>
+            <div>
+              <span class="header-title">告警通知</span>
+              <span class="header-desc">订阅用户超限/到期自动停用时的通知渠道</span>
+            </div>
+          </div>
+          <a-form :model="settingsData" layout="vertical" class="setting-form">
+            <a-form-item field="alert_webhook" label="Webhook 地址">
+              <a-input v-model="settingsData.alert_webhook" placeholder="https://example.com/hook（留空不启用）" allow-clear />
+            </a-form-item>
+            <a-form-item field="alert_telegram_token" label="Telegram Bot Token">
+              <a-input v-model="settingsData.alert_telegram_token" placeholder="123456:ABC-DEF..." allow-clear />
+            </a-form-item>
+            <a-form-item field="alert_telegram_chat" label="Telegram Chat ID">
+              <a-input v-model="settingsData.alert_telegram_chat" placeholder="@your_channel 或数字 ID" allow-clear />
+            </a-form-item>
+            <a-button type="primary" :loading="settingsLoading" @click="handleSaveSettings">
+              <template #icon><icon-save /></template>保存告警配置
+            </a-button>
+          </a-form>
+        </div>
+      </a-col>
+    </a-row>
   </div>
 </template>
 
@@ -174,7 +202,10 @@ const userStore = useUserStore()
 const settingsLoading = ref(false)
 const settingsFormRef = ref<FormInstance | null>(null)
 const settingsData = reactive<SystemSettings>({
-  public_host: ''
+  public_host: '',
+  alert_webhook: '',
+  alert_telegram_token: '',
+  alert_telegram_chat: ''
 })
 
 // 2. 密码修改状态

@@ -145,3 +145,9 @@ export const adminApi = {
   delete: (id: number | string) =>
     request.delete<any, ApiResponse<null>>(`/api/v1/admins/${id}`)
 }
+
+// 9. ACME 证书签发
+export const acmeApi = {
+  issue: (domain: string) =>
+    request.post<any, ApiResponse<{ cert_path: string; key_path: string }>>('/api/v1/acme/issue', { domain })
+}

@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
+	"github.com/HYuCN666/volans/internal/acme"
+	"github.com/HYuCN666/volans/internal/alert"
 	"github.com/HYuCN666/volans/internal/api/middleware"
 	v1 "github.com/HYuCN666/volans/internal/api/v1"
 	"github.com/HYuCN666/volans/internal/auth"
@@ -35,6 +38,7 @@ type Server struct {
 	hub     *ws.Hub
 	handler *v1.Handler
 	remote  *remoteStats
+	acme    *acme.Issuer
 }
 
 // New 构造服务。
@@ -47,6 +51,7 @@ func New(cfg *config.Config, db *store.Store) *Server {
 		stats:  stats.NewCollector(statsAPIAddr),
 		hub:    ws.NewHub(),
 		remote: newRemoteStats(),
+		acme:   acme.New(filepath.Join(cfg.DataDir, "certs")),
 	}
 	build := xray.BuildOptions{
 		APIListen: "127.0.0.1",
@@ -54,7 +59,7 @@ func New(cfg *config.Config, db *store.Store) *Server {
 		AccessLog: filepath.Join(cfg.DataDir, "xray", "access.log"),
 		ErrorLog:  filepath.Join(cfg.DataDir, "xray", "error.log"),
 	}
-	s.handler = v1.New(db, s.auth, s.xray, s.stats, build)
+	s.handler = v1.New(db, s.auth, s.xray, s.stats, s.acme, build)
 	return s
 }
 
@@ -70,6 +75,15 @@ func (s *Server) Run() error {
 	s.routes(r)
 
 	go s.maintenance(context.Background())
+
+	if s.cfg.ACMEHTTP > 0 {
+		go func() {
+			addr := fmt.Sprintf(":%d", s.cfg.ACMEHTTP)
+			if err := http.ListenAndServe(addr, s.acme.HTTPHandler()); err != nil {
+				log.Printf("ACME challenge server error: %v", err)
+			}
+		}()
+	}
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.Bind, s.cfg.Port)
 	if s.cfg.TLSCert != "" && s.cfg.TLSKey != "" {
@@ -120,6 +134,8 @@ func (s *Server) routes(r *gin.Engine) {
 		authed.POST("/admins", s.handler.CreateAdmin)
 		authed.PUT("/admins/:id", s.handler.UpdateAdmin)
 		authed.DELETE("/admins/:id", s.handler.DeleteAdmin)
+
+		authed.POST("/acme/issue", s.handler.IssueCert)
 
 		authed.GET("/node/status", s.handler.Status)
 		authed.POST("/node/control", s.handler.Control)
@@ -253,27 +269,46 @@ func (s *Server) applyTraffic() {
 	changed := false
 	users, _ := s.db.ListUsers(0)
 	now := time.Now()
+	var alerts []string
 	for _, u := range users {
 		if !u.Enabled {
 			continue
 		}
-		stop := (u.QuotaBytes > 0 && u.UsedUplink+u.UsedDownlink >= u.QuotaBytes) ||
-			(u.ExpireAt != nil && u.ExpireAt.Before(now))
-		if u.MaxDevices > 0 {
+		reason := ""
+		if u.QuotaBytes > 0 && u.UsedUplink+u.UsedDownlink >= u.QuotaBytes {
+			reason = "流量配额耗尽"
+		} else if u.ExpireAt != nil && u.ExpireAt.Before(now) {
+			reason = "已到期"
+		} else if u.MaxDevices > 0 {
 			if coll, err := s.collectorForUser(&u); err == nil {
 				if devices, err := coll.OnlineDevices(u.Email); err == nil && devices > int(u.MaxDevices) {
-					stop = true
+					reason = "并发设备数超限"
 				}
 			}
 		}
-		if stop {
+		if reason != "" {
 			_ = s.db.SetUserEnabled(u.ID, false)
 			changed = true
+			alerts = append(alerts, fmt.Sprintf("用户「%s」%s，已自动停用", u.Remark, reason))
 		}
 	}
 	if changed {
 		_ = s.handler.Rebuild()
 	}
+	if len(alerts) > 0 {
+		s.sendAlert("订阅用户自动停用", strings.Join(alerts, "\n"))
+	}
+}
+
+// sendAlert 读取告警配置并发送通知。
+func (s *Server) sendAlert(title, message string) {
+	webhook, _ := s.db.GetSetting("alert_webhook")
+	tgToken, _ := s.db.GetSetting("alert_telegram_token")
+	tgChat, _ := s.db.GetSetting("alert_telegram_chat")
+	if webhook == "" && tgToken == "" {
+		return
+	}
+	alert.Notify(alert.Config{Webhook: webhook, TelegramToken: tgToken, TelegramChat: tgChat}, title, message)
 }
 
 // collectAllStats 汇总本机与所有远端服务器的流量快照。

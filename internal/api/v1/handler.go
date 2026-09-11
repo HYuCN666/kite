@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/HYuCN666/volans/internal/acme"
 	"github.com/HYuCN666/volans/internal/auth"
 	"github.com/HYuCN666/volans/internal/model"
 	"github.com/HYuCN666/volans/internal/sshx"
@@ -20,12 +21,13 @@ type Handler struct {
 	auth  *auth.Manager
 	xray  *xray.Manager
 	stats *stats.Collector
+	acme  *acme.Issuer
 	build xray.BuildOptions
 }
 
 // New 构造 Handler。
-func New(s *store.Store, a *auth.Manager, x *xray.Manager, sc *stats.Collector, b xray.BuildOptions) *Handler {
-	return &Handler{store: s, auth: a, xray: x, stats: sc, build: b}
+func New(s *store.Store, a *auth.Manager, x *xray.Manager, sc *stats.Collector, ac *acme.Issuer, b xray.BuildOptions) *Handler {
+	return &Handler{store: s, auth: a, xray: x, stats: sc, acme: ac, build: b}
 }
 
 func respond(c *gin.Context, status, code int, message string, data any) {

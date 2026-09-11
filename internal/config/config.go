@@ -18,6 +18,7 @@ type Config struct {
 	Secret   string
 	TLSCert  string
 	TLSKey   string
+	ACMEHTTP int
 }
 
 // Load 从命令行参数与环境变量解析配置。
@@ -30,6 +31,7 @@ func Load() (*Config, error) {
 	var secret string
 	var tlsCert string
 	var tlsKey string
+	var acmeHTTP int
 
 	flag.StringVar(&bind, "bind", "127.0.0.1", "panel listen address")
 	flag.IntVar(&port, "port", 8080, "panel listen port")
@@ -39,6 +41,7 @@ func Load() (*Config, error) {
 	flag.StringVar(&secret, "secret", os.Getenv("VOLANS_SECRET"), "jwt signing secret")
 	flag.StringVar(&tlsCert, "tls-cert", os.Getenv("VOLANS_TLS_CERT"), "panel tls certificate path")
 	flag.StringVar(&tlsKey, "tls-key", os.Getenv("VOLANS_TLS_KEY"), "panel tls key path")
+	flag.IntVar(&acmeHTTP, "acme-http", 0, "ACME HTTP-01 challenge port (0 = disabled)")
 	flag.Parse()
 
 	if secret == "" {
@@ -58,6 +61,7 @@ func Load() (*Config, error) {
 		Secret:   secret,
 		TLSCert:  tlsCert,
 		TLSKey:   tlsKey,
+		ACMEHTTP: acmeHTTP,
 	}, nil
 }
 

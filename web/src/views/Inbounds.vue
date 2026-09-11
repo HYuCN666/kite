@@ -213,6 +213,13 @@
             <a-input v-model="formData.tls_server_name" placeholder="例如 node1.yourdomain.com" />
           </a-form-item>
 
+          <a-form-item>
+            <a-button type="outline" size="small" :loading="issuing" @click="autoIssueCert">
+              <template #icon><icon-safe /></template>自动签发证书 (Let's Encrypt)
+            </a-button>
+            <span class="acme-tip">需域名已解析到本服务器，且面板以 --acme-http 80 启动</span>
+          </a-form-item>
+
           <a-form-item field="tls_cert" label="TLS 证书路径 (或证书内容)">
             <a-textarea
               v-model="formData.tls_cert"
@@ -242,13 +249,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import type { FormInstance, FieldRule } from '@arco-design/web-vue'
-import { inboundApi, serverApi } from '@/api'
+import { inboundApi, serverApi, acmeApi } from '@/api'
 import type { InboundItem, ServerItem } from '@/types/api'
 
 const loading = ref(false)
 const inboundList = ref<InboundItem[]>([])
 const serverOptions = ref<ServerItem[]>([])
 const statusLoadingId = ref<number | string | null>(null)
+const issuing = ref(false)
 
 // 抽屉弹窗表单状态
 const drawerVisible = ref(false)
@@ -382,6 +390,26 @@ onMounted(() => {
   fetchInbounds()
   fetchServers()
 })
+
+// 自动签发证书
+const autoIssueCert = async () => {
+  const domain = formData.tls_server_name
+  if (!domain) {
+    Message.warning('请先填写 TLS SNI / 域名')
+    return
+  }
+  issuing.value = true
+  try {
+    const res = await acmeApi.issue(domain)
+    formData.tls_cert = res.data.cert_path
+    formData.tls_key = res.data.key_path
+    Message.success('证书签发成功，已自动填入路径')
+  } catch (e: any) {
+    Message.error(e?.response?.data?.message || '签发失败')
+  } finally {
+    issuing.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -468,5 +496,11 @@ onMounted(() => {
   border-radius: 6px;
   background-color: var(--color-fill-1);
   font-size: 13px;
+}
+
+.acme-tip {
+  margin-left: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 </style>
