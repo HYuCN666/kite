@@ -1,0 +1,81 @@
+:root {
+  /* 品牌主色：深邃蓝紫 (Volans Indigo) */
+  --color-primary-light-1: #eef2ff;
+  --color-primary-light-2: #e0e7ff;
+  --color-primary-light-3: #c7d2fe;
+  --color-primary-light-4: #a5b4fc;
+  --color-primary-base: #6366f1;
+  --color-primary-dark-1: #4f46e5;
+  --color-primary-dark-2: #4338ca;
+  --color-primary-dark-3: #3730a3;
+
+  --primary-6: #6366f1;
+  --primary-5: #818cf8;
+  --primary-7: #4f46e5;
+
+  /* 基础中性色 */
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --border-subtle: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+html[arco-theme='dark'] {
+  --bg-app: #090d16;
+  --bg-card: #111827;
+  --border-subtle: #1f293d;
+  --text-main: #f3f4f6;
+  --text-muted: #94a3b8;
+
+  --color-bg-1: #111827;
+  --color-bg-2: #161f33;
+  --color-bg-3: #1f293d;
+  --color-bg-4: #2d3748;
+  --color-border-1: #1f293d;
+  --color-border-2: #2d3748;
+  --color-border-3: #374151;
+  --color-text-1: #f3f4f6;
+  --color-text-2: #cbd5e1;
+  --color-text-3: #94a3b8;
+  --color-text-4: #64748b;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 滚动条极简设计 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+/* 极简卡片与容器通用样式 */
+.custom-card {
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  transition: all 0.2s ease-in-out;
+}
+
+.mono-font {
+  font-family: var(--font-mono);
+}

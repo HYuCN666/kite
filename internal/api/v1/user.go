@@ -3,6 +3,7 @@ package v1
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,13 +15,13 @@ import (
 )
 
 type userRequest struct {
-	InboundID          int64      `json:"inbound_id"`
-	Remark             string     `json:"remark"`
-	QuotaBytes         int64      `json:"quota_bytes"`
-	SpeedLimitUplink   int64      `json:"speed_limit_uplink"`
-	SpeedLimitDownlink int64      `json:"speed_limit_downlink"`
-	ExpireAt           *time.Time `json:"expire_at"`
-	Enabled            bool       `json:"enabled"`
+	InboundID          int64   `json:"inbound_id"`
+	Remark             string  `json:"remark"`
+	QuotaBytes         int64   `json:"quota_bytes"`
+	SpeedLimitUplink   int64   `json:"speed_limit_uplink"`
+	SpeedLimitDownlink int64   `json:"speed_limit_downlink"`
+	ExpireAt           *string `json:"expire_at"`
+	Enabled            bool    `json:"enabled"`
 }
 
 func (r *userRequest) validate() string {
@@ -28,6 +29,23 @@ func (r *userRequest) validate() string {
 		return "缺少入站"
 	}
 	return ""
+}
+
+func (r *userRequest) parseExpireAt() (*time.Time, error) {
+	if r.ExpireAt == nil || *r.ExpireAt == "" {
+		return nil, nil
+	}
+	for _, layout := range []string{
+		time.RFC3339,
+		"2006-01-02 15:04:05",
+		"2006-01-02T15:04:05",
+		"2006-01-02",
+	} {
+		if t, err := time.Parse(layout, *r.ExpireAt); err == nil {
+			return &t, nil
+		}
+	}
+	return nil, fmt.Errorf("invalid expire_at format")
 }
 
 // ListUsers 返回用户列表。
@@ -80,6 +98,11 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		fail(c, http.StatusBadRequest, 40001, msg)
 		return
 	}
+	expireAt, err := req.parseExpireAt()
+	if err != nil {
+		fail(c, http.StatusBadRequest, 40001, err.Error())
+		return
+	}
 
 	u := &model.User{
 		InboundID:          req.InboundID,
@@ -87,7 +110,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		QuotaBytes:         req.QuotaBytes,
 		SpeedLimitUplink:   req.SpeedLimitUplink,
 		SpeedLimitDownlink: req.SpeedLimitDownlink,
-		ExpireAt:           req.ExpireAt,
+		ExpireAt:           expireAt,
 		Enabled:            req.Enabled,
 	}
 	u.UUID = uuid.New().String()
@@ -134,11 +157,16 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		fail(c, http.StatusNotFound, 40400, "用户不存在")
 		return
 	}
+	expireAt, err := req.parseExpireAt()
+	if err != nil {
+		fail(c, http.StatusBadRequest, 40001, err.Error())
+		return
+	}
 	u.Remark = req.Remark
 	u.QuotaBytes = req.QuotaBytes
 	u.SpeedLimitUplink = req.SpeedLimitUplink
 	u.SpeedLimitDownlink = req.SpeedLimitDownlink
-	u.ExpireAt = req.ExpireAt
+	u.ExpireAt = expireAt
 	u.Enabled = req.Enabled
 
 	if err := h.store.UpdateUser(u); err != nil {

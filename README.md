@@ -6,6 +6,8 @@
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go)](https://go.dev)
 [![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vue.js)](https://vuejs.org)
 
+> 官网：https://hyucn666.github.io/volans/
+
 **Volans** 是一个自托管的可视化代理部署管理面板。它把「装内核、配节点、开用户、发订阅」这串繁琐的运维动作，压缩成浏览器里点几下鼠标。
 
 几分钟内，一台光秃秃的服务器就能变成一台可运营的代理节点。

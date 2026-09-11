@@ -66,6 +66,34 @@ func (r *inboundRequest) validate() string {
 	return ""
 }
 
+// inboundView 将入站模型转换为 API 响应（stream_settings 解析为对象）。
+func inboundView(in *model.Inbound) gin.H {
+	ss := gin.H{}
+	if parsed, err := in.ParseStreamSettings(); err == nil && parsed != nil {
+		ss["path"] = parsed.Path
+		ss["host"] = parsed.Host
+		if parsed.Headers != nil {
+			ss["headers"] = parsed.Headers
+		}
+	}
+	return gin.H{
+		"id":              in.ID,
+		"tag":             in.Tag,
+		"remark":          in.Remark,
+		"protocol":        in.Protocol,
+		"port":            in.Port,
+		"listen":          in.Listen,
+		"transport":       in.Transport,
+		"stream_settings": ss,
+		"tls_enabled":     in.TLSEnabled,
+		"tls_cert":        in.TLSCert,
+		"tls_key":         in.TLSKey,
+		"tls_server_name": in.TLSServerName,
+		"enable_sniffing": in.EnableSniffing,
+		"enabled":         in.Enabled,
+	}
+}
+
 // ListInbounds 返回入站列表。
 func (h *Handler) ListInbounds(c *gin.Context) {
 	inbounds, err := h.store.ListInbounds()
@@ -81,18 +109,9 @@ func (h *Handler) ListInbounds(c *gin.Context) {
 
 	out := make([]gin.H, 0, len(inbounds))
 	for _, in := range inbounds {
-		out = append(out, gin.H{
-			"id":          in.ID,
-			"tag":         in.Tag,
-			"remark":      in.Remark,
-			"protocol":    in.Protocol,
-			"port":        in.Port,
-			"listen":      in.Listen,
-			"transport":   in.Transport,
-			"tls_enabled": in.TLSEnabled,
-			"enabled":     in.Enabled,
-			"user_count":  counts[in.ID],
-		})
+		v := inboundView(&in)
+		v["user_count"] = counts[in.ID]
+		out = append(out, v)
 	}
 	ok(c, out)
 }
@@ -113,7 +132,7 @@ func (h *Handler) GetInbound(c *gin.Context) {
 		fail(c, http.StatusNotFound, 40400, "入站不存在")
 		return
 	}
-	ok(c, in)
+	ok(c, inboundView(in))
 }
 
 // CreateInbound 创建入站。

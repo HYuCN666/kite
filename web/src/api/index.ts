@@ -1,55 +1,88 @@
-import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
+import request from '@/utils/request'
+import type {
+  ApiResponse,
+  LoginParams,
+  LoginResult,
+  UpdatePasswordParams,
+  NodeStatus,
+  InboundItem,
+  UserItem,
+  SubscriptionResult,
+  StatsOverview,
+  SystemSettings
+} from '@/types/api'
 
-const client = axios.create({
-  baseURL: '/api/v1',
-  timeout: 15000,
-})
+// 1. 认证与账户
+export const authApi = {
+  login: (data: LoginParams) =>
+    request.post<any, ApiResponse<LoginResult>>('/api/v1/auth/login', data),
 
-client.interceptors.request.use((config) => {
-  const auth = useAuthStore()
-  if (auth.token) {
-    config.headers.Authorization = `Bearer ${auth.token}`
-  }
-  return config
-})
-
-client.interceptors.response.use(
-  (res) => res.data,
-  (err) => {
-    if (err.response?.status === 401) {
-      const auth = useAuthStore()
-      auth.logout()
-      window.location.href = '/login'
-    }
-    return Promise.reject(err)
-  },
-)
-
-export interface ApiResponse<T = unknown> {
-  code: number
-  message: string
-  data: T
+  updatePassword: (data: UpdatePasswordParams) =>
+    request.put<any, ApiResponse<null>>('/api/v1/auth/password', data)
 }
 
-export function get<T = unknown>(url: string, config?: any): Promise<ApiResponse<T>> {
-  return client.get(url, config) as unknown as Promise<ApiResponse<T>>
+// 2. 节点与状态
+export const nodeApi = {
+  getStatus: () =>
+    request.get<any, ApiResponse<NodeStatus>>('/api/v1/node/status'),
+
+  getStatsOverview: () =>
+    request.get<any, ApiResponse<StatsOverview>>('/api/v1/stats/overview')
 }
 
-export function post<T = unknown>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
-  return client.post(url, data, config) as unknown as Promise<ApiResponse<T>>
+// 3. 入站节点管理
+export const inboundApi = {
+  getList: () =>
+    request.get<any, ApiResponse<InboundItem[]>>('/api/v1/inbounds'),
+
+  getById: (id: number | string) =>
+    request.get<any, ApiResponse<InboundItem>>(`/api/v1/inbounds/${id}`),
+
+  create: (data: Partial<InboundItem>) =>
+    request.post<any, ApiResponse<InboundItem>>('/api/v1/inbounds', data),
+
+  update: (id: number | string, data: Partial<InboundItem>) =>
+    request.put<any, ApiResponse<InboundItem>>(`/api/v1/inbounds/${id}`, data),
+
+  delete: (id: number | string) =>
+    request.delete<any, ApiResponse<null>>(`/api/v1/inbounds/${id}`),
+
+  updateStatus: (id: number | string, enabled: boolean) =>
+    request.patch<any, ApiResponse<null>>(`/api/v1/inbounds/${id}/status`, { enabled })
 }
 
-export function put<T = unknown>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
-  return client.put(url, data, config) as unknown as Promise<ApiResponse<T>>
+// 4. 用户与订阅管理
+export const userApi = {
+  getList: (params?: { inbound_id?: number | string }) =>
+    request.get<any, ApiResponse<UserItem[]>>('/api/v1/users', { params }),
+
+  getById: (id: number | string) =>
+    request.get<any, ApiResponse<UserItem>>(`/api/v1/users/${id}`),
+
+  create: (data: Partial<UserItem>) =>
+    request.post<any, ApiResponse<UserItem>>('/api/v1/users', data),
+
+  update: (id: number | string, data: Partial<UserItem>) =>
+    request.put<any, ApiResponse<UserItem>>(`/api/v1/users/${id}`, data),
+
+  delete: (id: number | string) =>
+    request.delete<any, ApiResponse<null>>(`/api/v1/users/${id}`),
+
+  updateStatus: (id: number | string, enabled: boolean) =>
+    request.patch<any, ApiResponse<null>>(`/api/v1/users/${id}/status`, { enabled }),
+
+  resetTraffic: (id: number | string) =>
+    request.post<any, ApiResponse<null>>(`/api/v1/users/${id}/reset-traffic`),
+
+  getSubscription: (id: number | string) =>
+    request.get<any, ApiResponse<SubscriptionResult>>(`/api/v1/users/${id}/subscription`)
 }
 
-export function patch<T = unknown>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
-  return client.patch(url, data, config) as unknown as Promise<ApiResponse<T>>
-}
+// 5. 系统设置
+export const settingsApi = {
+  getSettings: () =>
+    request.get<any, ApiResponse<SystemSettings>>('/api/v1/settings'),
 
-export function del<T = unknown>(url: string, config?: any): Promise<ApiResponse<T>> {
-  return client.delete(url, config) as unknown as Promise<ApiResponse<T>>
+  updateSettings: (data: SystemSettings) =>
+    request.put<any, ApiResponse<SystemSettings>>('/api/v1/settings', data)
 }
-
-export default client
