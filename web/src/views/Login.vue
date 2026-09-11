@@ -27,7 +27,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
 import { IconUser, IconLock } from '@arco-design/web-vue/es/icon'
-import http from '@/api'
+import { post } from '@/api'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
@@ -46,7 +46,7 @@ async function handleSubmit() {
   }
   loading.value = true
   try {
-    const res = await http.post<{ data: { token: string } }>('/auth/login', form)
+    const res = await post<{ token: string }>('/auth/login', form)
     auth.setToken(res.data.token)
     auth.setUsername(form.username)
     Message.success('登录成功')

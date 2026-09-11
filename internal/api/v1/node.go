@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/HYuCN666/kite/internal/system"
 )
 
 // Status 返回内核状态。
@@ -19,6 +21,7 @@ func (h *Handler) Status(c *gin.Context) {
 		"installed": installed,
 		"version":   version,
 		"running":   h.xray.Running(),
+		"system":    system.Collect(),
 	})
 }
 

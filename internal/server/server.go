@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 
 	"github.com/HYuCN666/kite/internal/api/middleware"
 	v1 "github.com/HYuCN666/kite/internal/api/v1"
@@ -16,6 +18,7 @@ import (
 	"github.com/HYuCN666/kite/internal/config"
 	"github.com/HYuCN666/kite/internal/stats"
 	"github.com/HYuCN666/kite/internal/store"
+	"github.com/HYuCN666/kite/internal/ws"
 	"github.com/HYuCN666/kite/internal/xray"
 )
 
@@ -28,6 +31,7 @@ type Server struct {
 	auth    *auth.Manager
 	xray    *xray.Manager
 	stats   *stats.Collector
+	hub     *ws.Hub
 	handler *v1.Handler
 }
 
@@ -39,6 +43,7 @@ func New(cfg *config.Config, db *store.Store) *Server {
 		auth:  auth.NewManager(cfg.Secret, 24*time.Hour),
 		xray:  xray.NewManager(cfg.XrayPath, cfg.DataDir),
 		stats: stats.NewCollector(statsAPIAddr),
+		hub:   ws.NewHub(),
 	}
 	build := xray.BuildOptions{
 		APIListen: "127.0.0.1",
@@ -89,6 +94,7 @@ func (s *Server) bootstrap() error {
 func (s *Server) routes(r *gin.Engine) {
 	r.GET("/api/v1/health", s.health)
 	r.GET("/sub/:token", s.handler.Sub)
+	r.GET("/ws", s.wsHandler)
 
 	v1g := r.Group("/api/v1")
 	v1g.POST("/auth/login", s.handler.Login)
@@ -124,10 +130,53 @@ func (s *Server) routes(r *gin.Engine) {
 		authed.GET("/settings", s.handler.GetSettings)
 		authed.PUT("/settings", s.handler.UpdateSettings)
 	}
+
+	s.serveStatic(r)
 }
 
 func (s *Server) health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"code": 0, "message": "ok", "data": gin.H{"status": "up"}})
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(*http.Request) bool { return true },
+}
+
+func (s *Server) wsHandler(c *gin.Context) {
+	token := c.Query("token")
+	if _, err := s.auth.Parse(token); err != nil {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		return
+	}
+	s.hub.Register(conn)
+	defer s.hub.Unregister(conn)
+
+	for {
+		if _, _, err := conn.ReadMessage(); err != nil {
+			return
+		}
+	}
+}
+
+// serveStatic 服务前端产物（若存在）。
+func (s *Server) serveStatic(r *gin.Engine) {
+	dist := s.cfg.WebDir
+	if _, err := os.Stat(dist); err != nil {
+		return
+	}
+	r.NoRoute(func(c *gin.Context) {
+		p := filepath.Join(dist, filepath.Clean("/"+c.Request.URL.Path))
+		if info, err := os.Stat(p); err == nil && !info.IsDir() {
+			c.File(p)
+			return
+		}
+		c.File(filepath.Join(dist, "index.html"))
+	})
 }
 
 // maintenance 周期采集流量并执行配额/到期停用。
@@ -162,11 +211,23 @@ func (s *Server) applyTraffic() {
 		emailToID[u.Email] = u.ID
 	}
 
+	var totalUp, totalDown int64
 	for _, snap := range snaps {
+		totalUp += snap.Uplink
+		totalDown += snap.Downlink
 		if id, ok := emailToID[snap.Email]; ok {
 			_ = s.db.AddUserTraffic(id, snap.Uplink, snap.Downlink)
 		}
 	}
+
+	s.hub.Broadcast(map[string]any{
+		"type": "traffic",
+		"data": map[string]any{
+			"uplink":   totalUp,
+			"downlink": totalDown,
+			"time":     time.Now().Unix(),
+		},
+	})
 
 	changed := false
 	users, _ = s.db.ListUsers(0)

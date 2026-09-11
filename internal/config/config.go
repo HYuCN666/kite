@@ -12,6 +12,7 @@ type Config struct {
 	Port     int
 	DataDir  string
 	XrayPath string
+	WebDir   string
 	Secret   string
 }
 
@@ -21,12 +22,14 @@ func Load() (*Config, error) {
 	var port int
 	var dataDir string
 	var xrayPath string
+	var webDir string
 	var secret string
 
 	flag.StringVar(&bind, "bind", "127.0.0.1", "panel listen address")
 	flag.IntVar(&port, "port", 8080, "panel listen port")
 	flag.StringVar(&dataDir, "data", defaultDataDir(), "data directory")
 	flag.StringVar(&xrayPath, "xray", "/usr/local/bin/xray", "xray binary path")
+	flag.StringVar(&webDir, "web", "web/dist", "web dist directory")
 	flag.StringVar(&secret, "secret", os.Getenv("KITE_SECRET"), "jwt signing secret")
 	flag.Parse()
 
@@ -39,6 +42,7 @@ func Load() (*Config, error) {
 		Port:     port,
 		DataDir:  dataDir,
 		XrayPath: xrayPath,
+		WebDir:   webDir,
 		Secret:   secret,
 	}, nil
 }
