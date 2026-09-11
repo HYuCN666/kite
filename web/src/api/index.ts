@@ -7,6 +7,7 @@ import type {
   NodeStatus,
   InboundItem,
   UserItem,
+  ServerItem,
   SubscriptionResult,
   StatsOverview,
   SystemSettings
@@ -85,4 +86,31 @@ export const settingsApi = {
 
   updateSettings: (data: SystemSettings) =>
     request.put<any, ApiResponse<SystemSettings>>('/api/v1/settings', data)
+}
+
+// 6. 节点服务器管理
+export const serverApi = {
+  getList: () =>
+    request.get<any, ApiResponse<ServerItem[]>>('/api/v1/servers'),
+
+  create: (data: any) =>
+    request.post<any, ApiResponse<{ id: number }>>('/api/v1/servers', data),
+
+  update: (id: number | string, data: any) =>
+    request.put<any, ApiResponse<null>>(`/api/v1/servers/${id}`, data),
+
+  delete: (id: number | string) =>
+    request.delete<any, ApiResponse<null>>(`/api/v1/servers/${id}`),
+
+  test: (data: any) =>
+    request.post<any, ApiResponse<{ connected: boolean }>>('/api/v1/servers/test', data),
+
+  getStatus: (id: number | string) =>
+    request.get<any, ApiResponse<{ installed: boolean; version: string; running: boolean }>>(`/api/v1/servers/${id}/status`),
+
+  install: (id: number | string) =>
+    request.post<any, ApiResponse<null>>(`/api/v1/servers/${id}/install`),
+
+  control: (id: number | string, action: string) =>
+    request.post<any, ApiResponse<null>>(`/api/v1/servers/${id}/control`, { action })
 }

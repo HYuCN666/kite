@@ -231,6 +231,10 @@
           </a-col>
         </a-row>
 
+        <a-form-item field="max_devices" label="并发设备数限制" help="0 为不限制，超出将自动停用该订阅">
+          <a-input-number v-model="formData.max_devices" :min="0" :step="1" placeholder="0" />
+        </a-form-item>
+
         <!-- 到期时间 -->
         <a-form-item field="expire_at" label="到期时间" help="留空表示永久有效">
           <a-date-picker
@@ -289,6 +293,7 @@ const defaultFormData = (): UserItem => ({
   used_downlink: 0,
   speed_limit_uplink: 0,
   speed_limit_downlink: 0,
+  max_devices: 0,
   expire_at: '',
   enabled: true
 })

@@ -106,3 +106,19 @@ func parseName(name string) (email, dir string, ok bool) {
 	}
 	return parts[1], parts[3], true
 }
+
+// OnlineDevices 返回某用户当前在线设备（独立 IP）数量。
+func (c *Collector) OnlineDevices(email string) (int, error) {
+	if err := c.Connect(); err != nil {
+		return 0, err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := c.client.GetStatsOnlineIpList(ctx, &statscmd.GetStatsRequest{Name: email})
+	if err != nil {
+		// 用户不在线时返回 NotFound，视为 0 设备。
+		return 0, nil
+	}
+	return len(resp.GetIps()), nil
+}

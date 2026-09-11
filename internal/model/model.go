@@ -5,6 +5,7 @@ import "time"
 // Inbound 对应一个 Xray 入站节点。
 type Inbound struct {
 	ID             int64     `json:"id"`
+	ServerID       int64     `json:"server_id"`
 	Tag            string    `json:"tag"`
 	Remark         string    `json:"remark"`
 	Protocol       string    `json:"protocol"`
@@ -34,6 +35,7 @@ type User struct {
 	UsedDownlink       int64      `json:"used_downlink"`
 	SpeedLimitUplink   int64      `json:"speed_limit_uplink"`
 	SpeedLimitDownlink int64      `json:"speed_limit_downlink"`
+	MaxDevices         int64      `json:"max_devices"`
 	ExpireAt           *time.Time `json:"expire_at"`
 	Enabled            bool       `json:"enabled"`
 	CreatedAt          time.Time  `json:"created_at"`
@@ -58,6 +60,21 @@ type Subscription struct {
 	UserID    int64     `json:"user_id"`
 	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+// Server 表示一台被远程管理的节点服务器。
+type Server struct {
+	ID         int64     `json:"id"`
+	Name       string    `json:"name"`
+	Host       string    `json:"host"`
+	Port       int       `json:"port"`
+	Username   string    `json:"username"`
+	AuthType   string    `json:"auth_type"`
+	Password   string    `json:"-"`
+	PrivateKey string    `json:"-"`
+	Enabled    bool      `json:"enabled"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 // TrafficSnapshot 表示某个采集周期的流量增量。

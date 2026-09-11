@@ -112,6 +112,15 @@ func (s *Server) routes(r *gin.Engine) {
 		authed.POST("/node/control", s.handler.Control)
 		authed.POST("/node/install", s.handler.Install)
 
+		authed.GET("/servers", s.handler.ListServers)
+		authed.POST("/servers", s.handler.CreateServer)
+		authed.PUT("/servers/:id", s.handler.UpdateServer)
+		authed.DELETE("/servers/:id", s.handler.DeleteServer)
+		authed.POST("/servers/test", s.handler.TestServer)
+		authed.GET("/servers/:id/status", s.handler.ServerStatus)
+		authed.POST("/servers/:id/install", s.handler.ServerInstall)
+		authed.POST("/servers/:id/control", s.handler.ServerControl)
+
 		authed.GET("/inbounds", s.handler.ListInbounds)
 		authed.POST("/inbounds", s.handler.CreateInbound)
 		authed.GET("/inbounds/:id", s.handler.GetInbound)
@@ -201,39 +210,38 @@ func (s *Server) applyTraffic() {
 	if err != nil {
 		return
 	}
-	if len(snaps) == 0 {
-		return
-	}
 
-	users, err := s.db.ListUsers(0)
-	if err != nil {
-		return
-	}
-	emailToID := make(map[string]int64, len(users))
-	for _, u := range users {
-		emailToID[u.Email] = u.ID
-	}
-
-	var totalUp, totalDown int64
-	for _, snap := range snaps {
-		totalUp += snap.Uplink
-		totalDown += snap.Downlink
-		if id, ok := emailToID[snap.Email]; ok {
-			_ = s.db.AddUserTraffic(id, snap.Uplink, snap.Downlink)
+	if len(snaps) > 0 {
+		users, err := s.db.ListUsers(0)
+		if err != nil {
+			return
 		}
-	}
+		emailToID := make(map[string]int64, len(users))
+		for _, u := range users {
+			emailToID[u.Email] = u.ID
+		}
 
-	s.hub.Broadcast(map[string]any{
-		"type": "traffic",
-		"data": map[string]any{
-			"uplink":   totalUp,
-			"downlink": totalDown,
-			"time":     time.Now().Unix(),
-		},
-	})
+		var totalUp, totalDown int64
+		for _, snap := range snaps {
+			totalUp += snap.Uplink
+			totalDown += snap.Downlink
+			if id, ok := emailToID[snap.Email]; ok {
+				_ = s.db.AddUserTraffic(id, snap.Uplink, snap.Downlink)
+			}
+		}
+
+		s.hub.Broadcast(map[string]any{
+			"type": "traffic",
+			"data": map[string]any{
+				"uplink":   totalUp,
+				"downlink": totalDown,
+				"time":     time.Now().Unix(),
+			},
+		})
+	}
 
 	changed := false
-	users, _ = s.db.ListUsers(0)
+	users, _ := s.db.ListUsers(0)
 	now := time.Now()
 	for _, u := range users {
 		if !u.Enabled {
@@ -241,6 +249,11 @@ func (s *Server) applyTraffic() {
 		}
 		stop := (u.QuotaBytes > 0 && u.UsedUplink+u.UsedDownlink >= u.QuotaBytes) ||
 			(u.ExpireAt != nil && u.ExpireAt.Before(now))
+		if u.MaxDevices > 0 {
+			if devices, err := s.stats.OnlineDevices(u.Email); err == nil && devices > int(u.MaxDevices) {
+				stop = true
+			}
+		}
 		if stop {
 			_ = s.db.SetUserEnabled(u.ID, false)
 			changed = true

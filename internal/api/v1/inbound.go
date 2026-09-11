@@ -11,6 +11,7 @@ import (
 )
 
 type inboundRequest struct {
+	ServerID       int64                 `json:"server_id"`
 	Remark         string                `json:"remark"`
 	Protocol       string                `json:"protocol"`
 	Port           int                   `json:"port"`
@@ -26,6 +27,7 @@ type inboundRequest struct {
 }
 
 func (r *inboundRequest) toModel(in *model.Inbound) error {
+	in.ServerID = r.ServerID
 	in.Remark = r.Remark
 	in.Protocol = r.Protocol
 	in.Port = r.Port
@@ -78,6 +80,7 @@ func inboundView(in *model.Inbound) gin.H {
 	}
 	return gin.H{
 		"id":              in.ID,
+		"server_id":       in.ServerID,
 		"tag":             in.Tag,
 		"remark":          in.Remark,
 		"protocol":        in.Protocol,

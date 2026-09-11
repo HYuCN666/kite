@@ -9,7 +9,7 @@ import (
 )
 
 const userColumns = `id, inbound_id, email, uuid, remark, quota_bytes, used_uplink, used_downlink,
-	speed_limit_uplink, speed_limit_downlink, expire_at, enabled, created_at, updated_at`
+	speed_limit_uplink, speed_limit_downlink, max_devices, expire_at, enabled, created_at, updated_at`
 
 // ListUsers 返回（可选按入站过滤的）用户列表。
 func (s *Store) ListUsers(inboundID int64) ([]model.User, error) {
@@ -49,10 +49,10 @@ func (s *Store) CreateUser(u *model.User) (int64, error) {
 	res, err := s.db.Exec(
 		`INSERT INTO users
 		 (inbound_id, email, uuid, remark, quota_bytes, used_uplink, used_downlink,
-		  speed_limit_uplink, speed_limit_downlink, expire_at, enabled)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		  speed_limit_uplink, speed_limit_downlink, max_devices, expire_at, enabled)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		u.InboundID, u.Email, u.UUID, u.Remark, u.QuotaBytes, u.UsedUplink, u.UsedDownlink,
-		u.SpeedLimitUplink, u.SpeedLimitDownlink, u.ExpireAt, boolToInt(u.Enabled),
+		u.SpeedLimitUplink, u.SpeedLimitDownlink, u.MaxDevices, u.ExpireAt, boolToInt(u.Enabled),
 	)
 	if err != nil {
 		return 0, err
@@ -64,10 +64,10 @@ func (s *Store) CreateUser(u *model.User) (int64, error) {
 func (s *Store) UpdateUser(u *model.User) error {
 	_, err := s.db.Exec(
 		`UPDATE users SET remark = ?, quota_bytes = ?, speed_limit_uplink = ?,
-		 speed_limit_downlink = ?, expire_at = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP
+		 speed_limit_downlink = ?, max_devices = ?, expire_at = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP
 		 WHERE id = ?`,
 		u.Remark, u.QuotaBytes, u.SpeedLimitUplink, u.SpeedLimitDownlink,
-		u.ExpireAt, boolToInt(u.Enabled), u.ID,
+		u.MaxDevices, u.ExpireAt, boolToInt(u.Enabled), u.ID,
 	)
 	return err
 }
@@ -134,7 +134,7 @@ func scanUser(scanner interface{ Scan(...any) error }) (*model.User, error) {
 	err := scanner.Scan(
 		&u.ID, &u.InboundID, &email, &uuid, &remark, &u.QuotaBytes,
 		&u.UsedUplink, &u.UsedDownlink, &u.SpeedLimitUplink, &u.SpeedLimitDownlink,
-		&expire, &enabled, &u.CreatedAt, &u.UpdatedAt,
+		&u.MaxDevices, &expire, &enabled, &u.CreatedAt, &u.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil

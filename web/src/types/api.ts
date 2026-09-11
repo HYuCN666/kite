@@ -44,6 +44,7 @@ export interface StreamSettings {
 // 入站节点
 export interface InboundItem {
   id?: number | string
+  server_id?: number | string
   remark: string
   protocol: 'vless' | string
   port: number
@@ -70,9 +71,21 @@ export interface UserItem {
   used_downlink: number // 下行用量（字节）
   speed_limit_uplink: number // 限速（B/s 或 Mbps）
   speed_limit_downlink: number
+  max_devices: number // 并发设备数限制（0 为不限）
   expire_at: string | number // 到期时间
   enabled: boolean
   created_at?: string
+}
+
+// 节点服务器
+export interface ServerItem {
+  id: number | string
+  name: string
+  host: string
+  port?: number
+  username?: string
+  auth_type?: string
+  enabled: boolean
 }
 
 // 订阅链接响应

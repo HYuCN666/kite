@@ -20,6 +20,7 @@ type userRequest struct {
 	QuotaBytes         int64   `json:"quota_bytes"`
 	SpeedLimitUplink   int64   `json:"speed_limit_uplink"`
 	SpeedLimitDownlink int64   `json:"speed_limit_downlink"`
+	MaxDevices         int64   `json:"max_devices"`
 	ExpireAt           *string `json:"expire_at"`
 	Enabled            bool    `json:"enabled"`
 }
@@ -110,6 +111,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		QuotaBytes:         req.QuotaBytes,
 		SpeedLimitUplink:   req.SpeedLimitUplink,
 		SpeedLimitDownlink: req.SpeedLimitDownlink,
+		MaxDevices:         req.MaxDevices,
 		ExpireAt:           expireAt,
 		Enabled:            req.Enabled,
 	}
@@ -166,6 +168,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	u.QuotaBytes = req.QuotaBytes
 	u.SpeedLimitUplink = req.SpeedLimitUplink
 	u.SpeedLimitDownlink = req.SpeedLimitDownlink
+	u.MaxDevices = req.MaxDevices
 	u.ExpireAt = expireAt
 	u.Enabled = req.Enabled
 
@@ -275,6 +278,7 @@ func userView(u *model.User, sub *model.Subscription) gin.H {
 		"used_downlink":        u.UsedDownlink,
 		"speed_limit_uplink":   u.SpeedLimitUplink,
 		"speed_limit_downlink": u.SpeedLimitDownlink,
+		"max_devices":          u.MaxDevices,
 		"expire_at":            u.ExpireAt,
 		"enabled":              u.Enabled,
 	}

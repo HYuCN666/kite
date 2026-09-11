@@ -60,6 +60,13 @@ func (h *Handler) Sub(c *gin.Context) {
 			return
 		}
 		c.Data(http.StatusOK, "text/yaml; charset=utf-8", []byte(body))
+	case "singbox":
+		body, err := subscription.RenderSingbox(nodes)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "render failed")
+			return
+		}
+		c.Data(http.StatusOK, "application/json; charset=utf-8", []byte(body))
 	default:
 		c.Data(http.StatusOK, "text/plain; charset=utf-8", []byte(subscription.RenderV2RayN(nodes)))
 	}

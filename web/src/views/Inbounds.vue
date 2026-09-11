@@ -131,6 +131,16 @@
       @cancel="drawerVisible = false"
     >
       <a-form ref="formRef" :model="formData" :rules="formRules" layout="vertical">
+        <!-- 所属服务器 -->
+        <a-form-item field="server_id" label="部署服务器">
+          <a-select v-model="formData.server_id" placeholder="选择服务器">
+            <a-option :value="0">本机 (Local)</a-option>
+            <a-option v-for="sv in serverOptions" :key="sv.id" :value="sv.id">
+              {{ sv.name }} ({{ sv.host }})
+            </a-option>
+          </a-select>
+        </a-form-item>
+
         <!-- 节点名称 -->
         <a-form-item field="remark" label="节点名称 / 备注">
           <a-input v-model="formData.remark" placeholder="如：HK-Node-Vless-01" />
@@ -232,11 +242,12 @@
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import type { FormInstance, FieldRule } from '@arco-design/web-vue'
-import { inboundApi } from '@/api'
-import type { InboundItem } from '@/types/api'
+import { inboundApi, serverApi } from '@/api'
+import type { InboundItem, ServerItem } from '@/types/api'
 
 const loading = ref(false)
 const inboundList = ref<InboundItem[]>([])
+const serverOptions = ref<ServerItem[]>([])
 const statusLoadingId = ref<number | string | null>(null)
 
 // 抽屉弹窗表单状态
@@ -246,6 +257,7 @@ const submitLoading = ref(false)
 const formRef = ref<FormInstance | null>(null)
 
 const defaultFormData = (): InboundItem => ({
+  server_id: 0,
   remark: '',
   protocol: 'vless',
   port: 8443,
@@ -282,6 +294,18 @@ const fetchInbounds = async () => {
     // 统一拦截器处理
   } finally {
     loading.value = false
+  }
+}
+
+// 获取服务器选项
+const fetchServers = async () => {
+  try {
+    const res = await serverApi.getList()
+    if (res && res.data) {
+      serverOptions.value = res.data.filter((s: ServerItem) => s.id !== 0)
+    }
+  } catch (err) {
+    // 忽略
   }
 }
 
@@ -356,6 +380,7 @@ const handleDelete = async (id?: number | string) => {
 
 onMounted(() => {
   fetchInbounds()
+  fetchServers()
 })
 </script>
 

@@ -27,6 +27,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '入站节点', icon: 'IconStorage' }
       },
       {
+        path: 'servers',
+        name: 'Servers',
+        component: () => import('@/views/Servers.vue'),
+        meta: { title: '节点服务器', icon: 'IconCloud' }
+      },
+      {
         path: 'users',
         name: 'Users',
         component: () => import('@/views/Users.vue'),

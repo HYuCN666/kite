@@ -37,6 +37,10 @@
             <template #icon><icon-storage /></template>
             入站节点
           </a-menu-item>
+          <a-menu-item key="Servers">
+            <template #icon><icon-cloud /></template>
+            节点服务器
+          </a-menu-item>
           <a-menu-item key="Users">
             <template #icon><icon-user-group /></template>
             订阅用户

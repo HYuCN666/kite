@@ -2,6 +2,7 @@ package subscription
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -134,6 +135,57 @@ func RenderClash(nodes []*Node) (string, error) {
 	}
 
 	out, err := yaml.Marshal(doc)
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
+}
+
+// RenderSingbox 生成 sing-box 订阅配置（JSON outbounds）。
+func RenderSingbox(nodes []*Node) (string, error) {
+	type tlsConfig struct {
+		Enabled    bool   `json:"enabled"`
+		ServerName string `json:"server_name,omitempty"`
+	}
+	type wsTransport struct {
+		Type    string            `json:"type"`
+		Path    string            `json:"path,omitempty"`
+		Headers map[string]string `json:"headers,omitempty"`
+	}
+	type outbound struct {
+		Type       string       `json:"type"`
+		Tag        string       `json:"tag"`
+		Server     string       `json:"server"`
+		ServerPort int          `json:"server_port"`
+		UUID       string       `json:"uuid"`
+		TLS        *tlsConfig   `json:"tls,omitempty"`
+		Transport  *wsTransport `json:"transport,omitempty"`
+	}
+
+	outbounds := make([]outbound, 0, len(nodes))
+	for _, n := range nodes {
+		ob := outbound{
+			Type:       n.Protocol,
+			Tag:        n.Name,
+			Server:     n.Host,
+			ServerPort: n.Port,
+			UUID:       n.UUID,
+		}
+		if n.TLS {
+			ob.TLS = &tlsConfig{Enabled: true, ServerName: n.SNI}
+		}
+		if n.Network == "ws" {
+			ob.Transport = &wsTransport{
+				Type:    "ws",
+				Path:    n.WSPath,
+				Headers: map[string]string{"Host": n.Host},
+			}
+		}
+		outbounds = append(outbounds, ob)
+	}
+
+	doc := map[string]any{"outbounds": outbounds}
+	out, err := json.MarshalIndent(doc, "", "  ")
 	if err != nil {
 		return "", err
 	}

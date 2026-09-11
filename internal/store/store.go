@@ -51,7 +51,35 @@ func (s *Store) DB() *sql.DB { return s.db }
 func (s *Store) Close() error { return s.db.Close() }
 
 func migrate(db *sql.DB) error {
-	_, err := db.Exec(schema)
+	if _, err := db.Exec(schema); err != nil {
+		return err
+	}
+	if err := addColumnIfMissing(db, "users", "max_devices", "INTEGER NOT NULL DEFAULT 0"); err != nil {
+		return err
+	}
+	return addColumnIfMissing(db, "inbounds", "server_id", "INTEGER NOT NULL DEFAULT 0")
+}
+
+func addColumnIfMissing(db *sql.DB, table, column, definition string) error {
+	rows, err := db.Query("PRAGMA table_info(" + table + ")")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cid int
+		var name, ctype string
+		var notnull, pk int
+		var dflt any
+		if err := rows.Scan(&cid, &name, &ctype, &notnull, &dflt, &pk); err != nil {
+			return err
+		}
+		if name == column {
+			return nil
+		}
+	}
+	_, err = db.Exec("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition)
 	return err
 }
 
@@ -75,8 +103,23 @@ CREATE TABLE IF NOT EXISTS admins (
 	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS servers (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	host TEXT NOT NULL,
+	port INTEGER NOT NULL DEFAULT 22,
+	username TEXT NOT NULL DEFAULT 'root',
+	auth_type TEXT NOT NULL DEFAULT 'password',
+	password TEXT,
+	private_key TEXT,
+	enabled INTEGER NOT NULL DEFAULT 1,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS inbounds (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	server_id INTEGER NOT NULL DEFAULT 0,
 	tag TEXT NOT NULL,
 	remark TEXT,
 	protocol TEXT NOT NULL,
@@ -105,6 +148,7 @@ CREATE TABLE IF NOT EXISTS users (
 	used_downlink INTEGER NOT NULL DEFAULT 0,
 	speed_limit_uplink INTEGER NOT NULL DEFAULT 0,
 	speed_limit_downlink INTEGER NOT NULL DEFAULT 0,
+	max_devices INTEGER NOT NULL DEFAULT 0,
 	expire_at DATETIME,
 	enabled INTEGER NOT NULL DEFAULT 1,
 	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -8,7 +8,7 @@ import (
 	"github.com/HYuCN666/volans/internal/model"
 )
 
-const inboundColumns = `id, tag, remark, protocol, port, listen, transport, stream_settings,
+const inboundColumns = `id, server_id, tag, remark, protocol, port, listen, transport, stream_settings,
 	tls_enabled, tls_cert, tls_key, tls_server_name, enable_sniffing, enabled, created_at, updated_at`
 
 // ListInbounds 返回全部入站。
@@ -40,10 +40,10 @@ func (s *Store) GetInbound(id int64) (*model.Inbound, error) {
 func (s *Store) CreateInbound(in *model.Inbound) (int64, error) {
 	res, err := s.db.Exec(
 		`INSERT INTO inbounds
-		 (tag, remark, protocol, port, listen, transport, stream_settings,
+		 (server_id, tag, remark, protocol, port, listen, transport, stream_settings,
 		  tls_enabled, tls_cert, tls_key, tls_server_name, enable_sniffing, enabled)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		in.Tag, in.Remark, in.Protocol, in.Port, in.Listen, in.Transport, in.StreamSettings,
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		in.ServerID, in.Tag, in.Remark, in.Protocol, in.Port, in.Listen, in.Transport, in.StreamSettings,
 		boolToInt(in.TLSEnabled), in.TLSCert, in.TLSKey, in.TLSServerName,
 		boolToInt(in.EnableSniffing), boolToInt(in.Enabled),
 	)
@@ -56,11 +56,11 @@ func (s *Store) CreateInbound(in *model.Inbound) (int64, error) {
 // UpdateInbound 更新入站。
 func (s *Store) UpdateInbound(in *model.Inbound) error {
 	_, err := s.db.Exec(
-		`UPDATE inbounds SET remark = ?, protocol = ?, port = ?, listen = ?, transport = ?,
+		`UPDATE inbounds SET server_id = ?, remark = ?, protocol = ?, port = ?, listen = ?, transport = ?,
 		 stream_settings = ?, tls_enabled = ?, tls_cert = ?, tls_key = ?, tls_server_name = ?,
 		 enable_sniffing = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP
 		 WHERE id = ?`,
-		in.Remark, in.Protocol, in.Port, in.Listen, in.Transport, in.StreamSettings,
+		in.ServerID, in.Remark, in.Protocol, in.Port, in.Listen, in.Transport, in.StreamSettings,
 		boolToInt(in.TLSEnabled), in.TLSCert, in.TLSKey, in.TLSServerName,
 		boolToInt(in.EnableSniffing), boolToInt(in.Enabled), in.ID,
 	)
@@ -87,7 +87,7 @@ func scanInbound(scanner interface{ Scan(...any) error }) (*model.Inbound, error
 	var tlsEnabled, sniffing, enabled int
 	var stream, cert, key, sni sql.NullString
 	err := scanner.Scan(
-		&in.ID, &in.Tag, &in.Remark, &in.Protocol, &in.Port, &in.Listen, &in.Transport,
+		&in.ID, &in.ServerID, &in.Tag, &in.Remark, &in.Protocol, &in.Port, &in.Listen, &in.Transport,
 		&stream, &tlsEnabled, &cert, &key, &sni, &sniffing, &enabled,
 		&in.CreatedAt, &in.UpdatedAt,
 	)
