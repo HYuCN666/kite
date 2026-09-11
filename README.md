@@ -35,7 +35,7 @@
 ### 后端
 
 ```bash
-cd cmd/xpanel
+cd cmd/kite
 go run .
 ```
 

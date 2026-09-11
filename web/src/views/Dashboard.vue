@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="page">
     <div class="page-header">
       <div class="page-title">仪表盘</div>
@@ -98,13 +98,13 @@ onBeforeUnmount(() => {
 <style scoped>
 .stat-label {
   font-size: 13px;
-  color: var(--xpanel-text-secondary);
+  color: var(--kite-text-secondary);
 }
 
 .stat-value {
   margin-top: 8px;
   font-size: 22px;
   font-weight: 600;
-  color: var(--xpanel-text);
+  color: var(--kite-text);
 }
 </style>

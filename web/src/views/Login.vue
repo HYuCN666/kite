@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="login">
     <div class="login-card">
       <h1 class="login-title">Kite</h1>
@@ -70,20 +70,20 @@ async function handleSubmit() {
 .login-card {
   width: 360px;
   padding: 40px 36px;
-  background: var(--xpanel-surface);
-  border: 1px solid var(--xpanel-border);
+  background: var(--kite-surface);
+  border: 1px solid var(--kite-border);
   border-radius: 12px;
 }
 
 .login-title {
   font-size: 26px;
   font-weight: 700;
-  color: var(--xpanel-text);
+  color: var(--kite-text);
 }
 
 .login-sub {
   margin: 8px 0 28px;
   font-size: 13px;
-  color: var(--xpanel-text-secondary);
+  color: var(--kite-text-secondary);
 }
 </style>

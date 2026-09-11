@@ -1,5 +1,5 @@
 # ---- 构建后端 ----
-FROM golang:1.22-alpine AS backend
+FROM golang:1.27-alpine AS backend
 WORKDIR /src
 COPY go.mod go.sum* ./
 RUN go mod download

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-layout class="layout">
     <a-layout-sider :width="220" class="sider">
       <div class="logo">Kite</div>
@@ -57,11 +57,11 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const selectedKeys = computed(() => [route.path])
-const theme = ref(localStorage.getItem('xpanel_theme') || 'dark')
+const theme = ref(localStorage.getItem('kite_theme') || 'dark')
 
 function applyTheme() {
   document.documentElement.setAttribute('arco-theme', theme.value)
-  localStorage.setItem('xpanel_theme', theme.value)
+  localStorage.setItem('kite_theme', theme.value)
 }
 
 function toggleTheme() {
@@ -87,8 +87,8 @@ applyTheme()
 }
 
 .sider {
-  background: var(--xpanel-surface);
-  border-right: 1px solid var(--xpanel-border);
+  background: var(--kite-surface);
+  border-right: 1px solid var(--kite-border);
 }
 
 .logo {
@@ -98,7 +98,7 @@ applyTheme()
   padding: 0 20px;
   font-size: 18px;
   font-weight: 700;
-  color: var(--xpanel-primary);
+  color: var(--kite-primary);
 }
 
 .header {
@@ -107,8 +107,8 @@ applyTheme()
   align-items: center;
   justify-content: flex-end;
   padding: 0 20px;
-  background: var(--xpanel-surface);
-  border-bottom: 1px solid var(--xpanel-border);
+  background: var(--kite-surface);
+  border-bottom: 1px solid var(--kite-border);
 }
 
 .header-right {
@@ -119,11 +119,11 @@ applyTheme()
 
 .username {
   cursor: pointer;
-  color: var(--xpanel-text);
+  color: var(--kite-text);
 }
 
 .content {
   overflow: auto;
-  background: var(--xpanel-bg);
+  background: var(--kite-bg);
 }
 </style>

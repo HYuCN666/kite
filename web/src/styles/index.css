@@ -1,18 +1,18 @@
-:root {
-  --xpanel-bg: #f5f6f8;
-  --xpanel-surface: #ffffff;
-  --xpanel-border: #e5e6eb;
-  --xpanel-text: #1d2129;
-  --xpanel-text-secondary: #86909c;
-  --xpanel-primary: #165dff;
+﻿:root {
+  --kite-bg: #f5f6f8;
+  --kite-surface: #ffffff;
+  --kite-border: #e5e6eb;
+  --kite-text: #1d2129;
+  --kite-text-secondary: #86909c;
+  --kite-primary: #165dff;
 }
 
 html[arco-theme='dark'] {
-  --xpanel-bg: #17171a;
-  --xpanel-surface: #232324;
-  --xpanel-border: #2e2e30;
-  --xpanel-text: #e5e6eb;
-  --xpanel-text-secondary: #86909c;
+  --kite-bg: #17171a;
+  --kite-surface: #232324;
+  --kite-border: #2e2e30;
+  --kite-text: #e5e6eb;
+  --kite-text-secondary: #86909c;
 }
 
 * {
@@ -30,8 +30,8 @@ body,
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
     'Microsoft YaHei', sans-serif;
-  background: var(--xpanel-bg);
-  color: var(--xpanel-text);
+  background: var(--kite-bg);
+  color: var(--kite-text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -46,13 +46,13 @@ body {
 .page-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--xpanel-text);
+  color: var(--kite-text);
 }
 
 .page-desc {
   margin-top: 4px;
   font-size: 13px;
-  color: var(--xpanel-text-secondary);
+  color: var(--kite-text-secondary);
 }
 
 .card-grid {
