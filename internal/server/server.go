@@ -16,6 +16,7 @@ import (
 	v1 "github.com/HYuCN666/volans/internal/api/v1"
 	"github.com/HYuCN666/volans/internal/auth"
 	"github.com/HYuCN666/volans/internal/config"
+	"github.com/HYuCN666/volans/internal/model"
 	"github.com/HYuCN666/volans/internal/stats"
 	"github.com/HYuCN666/volans/internal/store"
 	"github.com/HYuCN666/volans/internal/ws"
@@ -33,17 +34,19 @@ type Server struct {
 	stats   *stats.Collector
 	hub     *ws.Hub
 	handler *v1.Handler
+	remote  *remoteStats
 }
 
 // New 构造服务。
 func New(cfg *config.Config, db *store.Store) *Server {
 	s := &Server{
-		cfg:   cfg,
-		db:    db,
-		auth:  auth.NewManager(cfg.Secret, 24*time.Hour),
-		xray:  xray.NewManager(cfg.XrayPath, cfg.DataDir),
-		stats: stats.NewCollector(statsAPIAddr),
-		hub:   ws.NewHub(),
+		cfg:    cfg,
+		db:     db,
+		auth:   auth.NewManager(cfg.Secret, 24*time.Hour),
+		xray:   xray.NewManager(cfg.XrayPath, cfg.DataDir),
+		stats:  stats.NewCollector(statsAPIAddr),
+		hub:    ws.NewHub(),
+		remote: newRemoteStats(),
 	}
 	build := xray.BuildOptions{
 		APIListen: "127.0.0.1",
@@ -206,10 +209,7 @@ func (s *Server) maintenance(ctx context.Context) {
 }
 
 func (s *Server) applyTraffic() {
-	snaps, err := s.stats.Collect()
-	if err != nil {
-		return
-	}
+	snaps := s.collectAllStats()
 
 	if len(snaps) > 0 {
 		users, err := s.db.ListUsers(0)
@@ -250,8 +250,10 @@ func (s *Server) applyTraffic() {
 		stop := (u.QuotaBytes > 0 && u.UsedUplink+u.UsedDownlink >= u.QuotaBytes) ||
 			(u.ExpireAt != nil && u.ExpireAt.Before(now))
 		if u.MaxDevices > 0 {
-			if devices, err := s.stats.OnlineDevices(u.Email); err == nil && devices > int(u.MaxDevices) {
-				stop = true
+			if coll, err := s.collectorForUser(&u); err == nil {
+				if devices, err := coll.OnlineDevices(u.Email); err == nil && devices > int(u.MaxDevices) {
+					stop = true
+				}
 			}
 		}
 		if stop {
@@ -262,4 +264,45 @@ func (s *Server) applyTraffic() {
 	if changed {
 		_ = s.handler.Rebuild()
 	}
+}
+
+// collectAllStats 汇总本机与所有远端服务器的流量快照。
+func (s *Server) collectAllStats() []stats.Snapshot {
+	var all []stats.Snapshot
+	if snaps, err := s.stats.Collect(); err == nil {
+		all = append(all, snaps...)
+	}
+
+	servers, err := s.db.ListServers()
+	if err != nil {
+		return all
+	}
+	for _, sv := range servers {
+		if !sv.Enabled {
+			continue
+		}
+		coll, err := s.remote.get(s.db, sv.ID)
+		if err != nil {
+			continue
+		}
+		snaps, err := coll.Collect()
+		if err != nil {
+			s.remote.drop(sv.ID)
+			continue
+		}
+		all = append(all, snaps...)
+	}
+	return all
+}
+
+// collectorForUser 返回用户所属服务器对应的统计采集器。
+func (s *Server) collectorForUser(u *model.User) (*stats.Collector, error) {
+	in, err := s.db.GetInbound(u.InboundID)
+	if err != nil || in == nil {
+		return nil, fmt.Errorf("inbound not found")
+	}
+	if in.ServerID == 0 {
+		return s.stats, nil
+	}
+	return s.remote.get(s.db, in.ServerID)
 }

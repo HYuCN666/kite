@@ -106,9 +106,10 @@ systemctl daemon-reload && systemctl enable --now volans
 - [x] 单机 MVP：内核管理、节点、用户、订阅、实时流量
 - [x] 安全加固：密钥持久化、登录锁定/限流、面板 HTTPS
 - [x] 并发设备数限制、Sing-box 订阅、多服务器管理（SSH）
+- [x] 远程节点流量监控（SSH 隧道采集）
 - [ ] ACME 自动证书
 - [ ] 多管理员 + RBAC、2FA
-- [ ] 远程节点流量监控、告警
+- [ ] 告警
 
 ## 许可证
 

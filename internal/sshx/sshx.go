@@ -3,6 +3,7 @@ package sshx
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"time"
 
@@ -107,4 +108,36 @@ func (c *Client) WriteFile(path string, content []byte) error {
 
 	session.Stdin = bytes.NewReader(content)
 	return session.Run("mkdir -p $(dirname " + path + ") && cat > " + path)
+}
+
+// ForwardLocal 建立本地端口到远端地址的转发，返回本地监听地址。
+func (c *Client) ForwardLocal(remoteAddr string) (string, error) {
+	if err := c.Connect(); err != nil {
+		return "", err
+	}
+	listener, err := c.client.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return "", err
+	}
+
+	go func() {
+		for {
+			local, err := listener.Accept()
+			if err != nil {
+				return
+			}
+			go func(local net.Conn) {
+				defer local.Close()
+				remote, err := c.client.Dial("tcp", remoteAddr)
+				if err != nil {
+					return
+				}
+				defer remote.Close()
+				go func() { _, _ = io.Copy(remote, local) }()
+				_, _ = io.Copy(local, remote)
+			}(local)
+		}
+	}()
+
+	return listener.Addr().String(), nil
 }
