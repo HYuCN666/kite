@@ -46,6 +46,11 @@ func (m *Manager) Restart() error {
 	return m.proc.Restart()
 }
 
+// Reload 触发热重载，不中断现有连接。
+func (m *Manager) Reload() error {
+	return m.proc.Reload()
+}
+
 // Running 返回进程是否在运行。
 func (m *Manager) Running() bool {
 	return m.proc.IsRunning()
@@ -66,5 +71,8 @@ func (m *Manager) WriteConfig(cfg *config.Config) error {
 	if !m.Installed() {
 		return nil
 	}
-	return m.Restart()
+	if m.Running() {
+		return m.Reload()
+	}
+	return m.Start()
 }

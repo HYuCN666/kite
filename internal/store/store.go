@@ -24,6 +24,18 @@ func Open(dataDir string) (*Store, error) {
 		return nil, err
 	}
 
+	// SQLite 单写者模型，限制为单连接避免 database is locked。
+	db.SetMaxOpenConns(1)
+
+	if _, err := db.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		db.Close()
+		return nil, err
+	}
+	if _, err := db.Exec("PRAGMA busy_timeout=5000"); err != nil {
+		db.Close()
+		return nil, err
+	}
+
 	if err := migrate(db); err != nil {
 		db.Close()
 		return nil, err

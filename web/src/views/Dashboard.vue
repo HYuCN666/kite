@@ -59,9 +59,15 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { EChartsType } from 'echarts/core'
 import { get } from '@/api'
 import { useAuthStore } from '@/stores/auth'
+
+echarts.use([LineChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
 
 const auth = useAuthStore()
 const chartRef = ref<HTMLElement>()
@@ -71,7 +77,7 @@ const sys = reactive({ cpu: 0, mem: 0, disk: 0, load: 0 })
 const inboundCount = ref(0)
 const userCount = ref(0)
 
-let chart: echarts.ECharts | null = null
+let chart: EChartsType | null = null
 let ws: WebSocket | null = null
 const times: string[] = []
 const upData: number[] = []
