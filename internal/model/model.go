@@ -47,6 +47,8 @@ type Admin struct {
 	ID            int64      `json:"id"`
 	Username      string     `json:"username"`
 	PasswordHash  string     `json:"-"`
+	Role          string     `json:"role"`
+	TOTPSecret    string     `json:"-"`
 	LastLoginAt   *time.Time `json:"last_login_at"`
 	FailedAttempt int        `json:"-"`
 	LockedUntil   *time.Time `json:"-"`

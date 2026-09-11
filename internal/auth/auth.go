@@ -34,14 +34,16 @@ func (m *Manager) CheckPassword(hash, password string) bool {
 type Claims struct {
 	UserID   int64  `json:"uid"`
 	Username string `json:"username"`
+	Role     string `json:"role"`
 	jwt.RegisteredClaims
 }
 
 // Sign 签发 token。
-func (m *Manager) Sign(userID int64, username string) (string, error) {
+func (m *Manager) Sign(userID int64, username, role string) (string, error) {
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
+		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(m.ttl)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

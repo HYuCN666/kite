@@ -49,6 +49,10 @@
             <template #icon><icon-settings /></template>
             系统设置
           </a-menu-item>
+          <a-menu-item key="Admins">
+            <template #icon><icon-user /></template>
+            管理员管理
+          </a-menu-item>
         </a-menu>
       </div>
 

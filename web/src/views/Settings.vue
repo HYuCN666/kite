@@ -120,6 +120,40 @@
         </div>
       </a-col>
     </a-row>
+
+    <a-row :gutter="[20, 20]" style="margin-top: 20px">
+      <a-col :span="24">
+        <div class="custom-card setting-card">
+          <div class="card-header">
+            <div class="header-icon"><icon-safe /></div>
+            <div>
+              <span class="header-title">双因素认证 (2FA)</span>
+              <span class="header-desc">开启后登录需额外输入 6 位动态验证码，建议配合 Google Authenticator 等工具</span>
+            </div>
+          </div>
+
+          <div v-if="!twofa.enabled" class="twofa-panel">
+            <a-button type="primary" :loading="twofa.setupLoading" @click="start2FA">开启两步验证</a-button>
+            <div v-if="twofa.secret" class="twofa-setup">
+              <img v-if="twofa.qr" :src="twofa.qr" class="qr-img" alt="2FA 二维码" />
+              <div class="twofa-secret">密钥：<span class="mono-font">{{ twofa.secret }}</span></div>
+              <div class="twofa-confirm-row">
+                <a-input v-model="twofa.code" placeholder="输入 6 位验证码" :max-length="6" style="width: 220px" />
+                <a-button type="primary" :loading="twofa.confirmLoading" @click="confirm2FA">确认启用</a-button>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="twofa-panel">
+            <a-tag color="green">已开启</a-tag>
+            <div class="twofa-confirm-row" style="margin-top: 12px">
+              <a-input v-model="twofa.disableCode" placeholder="输入 6 位验证码" :max-length="6" style="width: 220px" />
+              <a-button status="danger" :loading="twofa.disableLoading" @click="disable2FA">关闭 2FA</a-button>
+            </div>
+          </div>
+        </div>
+      </a-col>
+    </a-row>
   </div>
 </template>
 
@@ -128,7 +162,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message, Modal } from '@arco-design/web-vue'
 import type { FormInstance, FieldRule } from '@arco-design/web-vue'
-import { settingsApi, authApi } from '@/api'
+import QRCode from 'qrcode'
+import { settingsApi, authApi, twofaApi } from '@/api'
 import { useUserStore } from '@/store/user'
 import type { SystemSettings } from '@/types/api'
 
@@ -227,7 +262,78 @@ const handleUpdatePassword = async () => {
 
 onMounted(() => {
   fetchSettings()
+  fetch2FA()
 })
+
+// 3. 2FA 双因素认证
+const twofa = reactive({
+  enabled: false,
+  secret: '',
+  qr: '',
+  code: '',
+  disableCode: '',
+  setupLoading: false,
+  confirmLoading: false,
+  disableLoading: false
+})
+
+const fetch2FA = async () => {
+  try {
+    const res = await twofaApi.status()
+    twofa.enabled = res.data.enabled
+  } catch (err) {
+    // 忽略
+  }
+}
+
+const start2FA = async () => {
+  twofa.setupLoading = true
+  try {
+    const res = await twofaApi.enable()
+    twofa.secret = res.data.secret
+    twofa.qr = await QRCode.toDataURL(res.data.url, { width: 180, margin: 2 })
+  } finally {
+    twofa.setupLoading = false
+  }
+}
+
+const confirm2FA = async () => {
+  if (!twofa.code) {
+    Message.warning('请输入验证码')
+    return
+  }
+  twofa.confirmLoading = true
+  try {
+    await twofaApi.confirm({ secret: twofa.secret, code: twofa.code })
+    Message.success('2FA 已启用')
+    twofa.enabled = true
+    twofa.secret = ''
+    twofa.qr = ''
+    twofa.code = ''
+  } catch (e: any) {
+    Message.error(e?.response?.data?.message || '验证码错误')
+  } finally {
+    twofa.confirmLoading = false
+  }
+}
+
+const disable2FA = async () => {
+  if (!twofa.disableCode) {
+    Message.warning('请输入验证码')
+    return
+  }
+  twofa.disableLoading = true
+  try {
+    await twofaApi.disable({ code: twofa.disableCode })
+    Message.success('2FA 已关闭')
+    twofa.enabled = false
+    twofa.disableCode = ''
+  } catch (e: any) {
+    Message.error(e?.response?.data?.message || '验证码错误')
+  } finally {
+    twofa.disableLoading = false
+  }
+}
 </script>
 
 <style scoped>
@@ -305,5 +411,41 @@ onMounted(() => {
 
 .form-action-row {
   margin-top: 24px;
+}
+
+.twofa-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.twofa-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.qr-img {
+  width: 180px;
+  height: 180px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.twofa-secret {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.twofa-confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mono-font {
+  font-family: monospace;
 }
 </style>

@@ -10,6 +10,7 @@ import (
 type loginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Code     string `json:"code"`
 }
 
 // Login 处理登录请求。
@@ -36,10 +37,16 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	if !h.auth.CheckPassword(admin.PasswordHash, req.Password) {
-		attempts, _, _ := h.store.RegisterLoginFailure(admin.ID)
+		_, _, _ = h.store.RegisterLoginFailure(admin.ID)
 		fail(c, http.StatusUnauthorized, 40100, "用户名或密码错误")
-		_ = attempts
 		return
+	}
+
+	if admin.TOTPSecret != "" {
+		if req.Code == "" || !h.auth.ValidateTOTP(admin.TOTPSecret, req.Code, 1) {
+			fail(c, http.StatusUnauthorized, 40100, "动态验证码错误")
+			return
+		}
 	}
 
 	if err := h.store.RegisterLoginSuccess(admin.ID); err != nil {
@@ -47,7 +54,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.auth.Sign(admin.ID, admin.Username)
+	token, err := h.auth.Sign(admin.ID, admin.Username, admin.Role)
 	if err != nil {
 		fail(c, http.StatusInternalServerError, 50000, "internal error")
 		return
@@ -59,7 +66,7 @@ func (h *Handler) Login(c *gin.Context) {
 // Me 返回当前登录用户信息。
 func (h *Handler) Me(c *gin.Context) {
 	claims := mustClaims(c)
-	ok(c, gin.H{"uid": claims.UserID, "username": claims.Username})
+	ok(c, gin.H{"uid": claims.UserID, "username": claims.Username, "role": claims.Role})
 }
 
 type changePasswordRequest struct {

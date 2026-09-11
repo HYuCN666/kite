@@ -90,7 +90,7 @@ func (s *Server) bootstrap() error {
 	if err != nil {
 		return err
 	}
-	if _, err := s.db.CreateAdmin("admin", hash); err != nil {
+	if _, err := s.db.CreateAdmin("admin", hash, "admin"); err != nil {
 		return err
 	}
 	log.Println("已创建默认管理员 admin/admin，请尽快修改密码")
@@ -110,6 +110,16 @@ func (s *Server) routes(r *gin.Engine) {
 	{
 		authed.GET("/auth/me", s.handler.Me)
 		authed.PUT("/auth/password", s.handler.ChangePassword)
+
+		authed.GET("/auth/2fa/status", s.handler.TwoFAStatus)
+		authed.POST("/auth/2fa/enable", s.handler.TwoFAEnable)
+		authed.POST("/auth/2fa/confirm", s.handler.TwoFAConfirm)
+		authed.POST("/auth/2fa/disable", s.handler.TwoFADisable)
+
+		authed.GET("/admins", s.handler.ListAdmins)
+		authed.POST("/admins", s.handler.CreateAdmin)
+		authed.PUT("/admins/:id", s.handler.UpdateAdmin)
+		authed.DELETE("/admins/:id", s.handler.DeleteAdmin)
 
 		authed.GET("/node/status", s.handler.Status)
 		authed.POST("/node/control", s.handler.Control)

@@ -8,6 +8,7 @@ import type {
   InboundItem,
   UserItem,
   ServerItem,
+  AdminItem,
   SubscriptionResult,
   StatsOverview,
   SystemSettings
@@ -113,4 +114,34 @@ export const serverApi = {
 
   control: (id: number | string, action: string) =>
     request.post<any, ApiResponse<null>>(`/api/v1/servers/${id}/control`, { action })
+}
+
+// 7. 2FA 双因素认证
+export const twofaApi = {
+  status: () =>
+    request.get<any, ApiResponse<{ enabled: boolean }>>('/api/v1/auth/2fa/status'),
+
+  enable: () =>
+    request.post<any, ApiResponse<{ secret: string; url: string }>>('/api/v1/auth/2fa/enable'),
+
+  confirm: (data: { secret: string; code: string }) =>
+    request.post<any, ApiResponse<null>>('/api/v1/auth/2fa/confirm', data),
+
+  disable: (data: { code: string }) =>
+    request.post<any, ApiResponse<null>>('/api/v1/auth/2fa/disable', data)
+}
+
+// 8. 管理员管理
+export const adminApi = {
+  getList: () =>
+    request.get<any, ApiResponse<AdminItem[]>>('/api/v1/admins'),
+
+  create: (data: { username: string; password: string; role: string }) =>
+    request.post<any, ApiResponse<{ id: number }>>('/api/v1/admins', data),
+
+  update: (id: number | string, data: { role?: string; password?: string }) =>
+    request.put<any, ApiResponse<null>>(`/api/v1/admins/${id}`, data),
+
+  delete: (id: number | string) =>
+    request.delete<any, ApiResponse<null>>(`/api/v1/admins/${id}`)
 }

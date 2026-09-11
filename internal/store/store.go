@@ -57,7 +57,13 @@ func migrate(db *sql.DB) error {
 	if err := addColumnIfMissing(db, "users", "max_devices", "INTEGER NOT NULL DEFAULT 0"); err != nil {
 		return err
 	}
-	return addColumnIfMissing(db, "inbounds", "server_id", "INTEGER NOT NULL DEFAULT 0")
+	if err := addColumnIfMissing(db, "inbounds", "server_id", "INTEGER NOT NULL DEFAULT 0"); err != nil {
+		return err
+	}
+	if err := addColumnIfMissing(db, "admins", "role", "TEXT NOT NULL DEFAULT 'admin'"); err != nil {
+		return err
+	}
+	return addColumnIfMissing(db, "admins", "totp_secret", "TEXT")
 }
 
 func addColumnIfMissing(db *sql.DB, table, column, definition string) error {
@@ -96,6 +102,8 @@ CREATE TABLE IF NOT EXISTS admins (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	username TEXT NOT NULL UNIQUE,
 	password_hash TEXT NOT NULL,
+	role TEXT NOT NULL DEFAULT 'admin',
+	totp_secret TEXT,
 	last_login_at DATETIME,
 	failed_attempts INTEGER NOT NULL DEFAULT 0,
 	locked_until DATETIME,

@@ -46,6 +46,20 @@
             </a-input-password>
           </a-form-item>
 
+          <a-form-item field="code" label="动态验证码（已开启 2FA 时填写）">
+            <a-input
+              v-model="form.code"
+              placeholder="6 位动态验证码"
+              size="large"
+              allow-clear
+              :max-length="6"
+            >
+              <template #prefix>
+                <icon-safe />
+              </template>
+            </a-input>
+          </a-form-item>
+
           <div class="form-footer">
             <a-button
               type="primary"
@@ -82,7 +96,8 @@ const userStore = useUserStore()
 const loading = ref(false)
 const form = reactive<LoginParams>({
   username: '',
-  password: ''
+  password: '',
+  code: ''
 })
 
 const handleSubmit = async () => {

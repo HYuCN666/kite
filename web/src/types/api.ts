@@ -9,6 +9,7 @@ export interface ApiResponse<T = any> {
 export interface LoginParams {
   username: string
   password: string
+  code?: string
 }
 
 export interface LoginResult {
@@ -105,6 +106,15 @@ export interface StatsOverview {
 export interface SystemSettings {
   public_host?: string
   [key: string]: any
+}
+
+// 管理员
+export interface AdminItem {
+  id: number | string
+  username: string
+  role: string
+  totp_enabled: boolean
+  created_at?: string
 }
 
 // WebSocket 实时流量数据
