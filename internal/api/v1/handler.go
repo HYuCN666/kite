@@ -57,6 +57,10 @@ func (h *Handler) rebuild() error {
 	for _, in := range inbounds {
 		byServer[in.ServerID] = append(byServer[in.ServerID], in)
 	}
+	// 确保本机（server 0）始终生成配置，即使没有任何入站。
+	if _, ok := byServer[0]; !ok {
+		byServer[0] = []model.Inbound{}
+	}
 	usersByInbound := map[int64][]model.User{}
 	for _, u := range users {
 		usersByInbound[u.InboundID] = append(usersByInbound[u.InboundID], u)
